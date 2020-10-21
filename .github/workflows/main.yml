@@ -10,6 +10,8 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           root_file: thesis.tex
+          args: "-f"
+          post_compile: "latexmk -c"
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
