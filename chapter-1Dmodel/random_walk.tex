@@ -1,0 +1,546 @@
+%!TEX root = ../thesis.tex
+
+\begin{section}{Random walk strategies\label{sec:1dRW}}
+
+The first type of strategy we investigate is the random walk.
+Recall from \cref{def:tc:stochastic:randomwalk}, that a random walk is a path of successive steps on some mathematical space.
+For the one-dimensional model in question, the mathematical space is the search interval $[0,\lambda]$, although since $r_v$ is constant we may just consider the interval $[r_v,\lambda-r_v]$ as the entire search space.
+The forager moves according to a random walk, beginning at some known location $x_0 = a$, for $a \in [r_v,\lambda-r_v]$.
+
+We denote the location of the forager after taking $i$ steps as $X_i$, which is a random variable, or as $x_i$ for a single realisation, for $i \geq 0$.
+The length of the $i$th step taken, $\ell_i = X_{i}-X_{i-1}$, is distributed according to some probability distribution, $\ell_i \sim p(\ell)$, which we call the \emph{step-length distribution}.
+According to this definition, the length of a step is negative for steps to the left, and positive for steps to the right.
+We require $p(\ell)$ to be symmetric about zero, which gives the forager an equal chance of moving in either direction.
+The step length is drawn from a distribution with values from $(-\infty,\infty)$, but since the search space is finite, steps moving beyond the boundary will be truncated.
+Since a search ends once the forager has left the search interval and hence located food, we are not concerned with where the forager would have ended up after the final step, and instead are concerned with the cost attributed to the final step.
+Thus, we avoid having to reconstruct $p(\ell)$ to account for the truncation by instead adjusting the cost function (see \cref{eq:1dRW_cost:cost_truncation}).
+We also require that the step-length distribution has a minimum step size, and optionally may have a maximum step size. That is, we consider step-length distributions that have $\abs{\ell} \in [\lmin,\lmax]$, with $\lmin > 0$ since a forager must move every step, and $\lmax \geq \lmin$. For unbounded step-length distributions we have $\lmax \to \infty$.
+Once a food patch has been located, the forager stops moving and hence all future positions are the same, given by $X_{\tau} = X_{\tau+1} = \dots$, where $\tau$ is a stopping time corresponding to the time at which the first target is found, and so may take any positive integer value.
+
+
+\begin{subsection}{Total cost of a random walk strategy\label{sec:1dRW_cost}}
+
+The total cost accumulated to reach a food patch is denoted $Q(x_0)$, where $x_0$ is the starting location of the random walk.
+The total cost is, of course, the sum of the cost of every step,
+\begin{equation}
+	\label{eq:1dRW_cost:Q_sum_q}
+	Q(x_0) = \sum_{n=0}^{\tau-1} q(X_n,X_{n+1}),
+\end{equation}
+where $q(X_n,X_{n+1})$ is non-negative for all $n$.
+The cost of a single step, $q(X_n,X_{n+1})$, is a function of the start and end locations of a step, although not of the step number itself.
+Recall that we must truncate the cost function for steps that travel beyond the boundaries, and so our cost function becomes
+\begin{equation}
+\label{eq:1dRW_cost:cost_truncation}
+q(X_n,X_{n+1}) = \begin{cases}
+q^*(X_n,r_v) \quad &\text{if }X_{n+1} < r_v,\\
+q^*(X_n,X_{n+1})  \quad &\text{if } r_v \leq X_{n+1} \leq \lambda-r_v,\\
+q^*(X_n,\lambda - r_v) \quad &\text{if }X_{n+1} > \lambda - r_v,
+\end{cases}
+\end{equation}
+where $q^*(X_n,X_{n+1})$ is the function representing the \emph{untruncated} cost of a step from $X_n$ to $X_{n+1}$.
+
+As an example, the untruncated cost function we use when considering the distance travelled on the $n$th step is
+\begin{equation*}
+q^*(X_n,X_{n+1}) = \left| X_{n+1} - X_n \right|,
+\end{equation*}
+and hence the cost function will be
+\begin{equation*}
+q(X_n,X_{n+1}) = \begin{cases}
+\left| r_v - X_n \right| \quad &\text{if }X_{n+1} < r_v,\\
+\left| X_{n+1} - X_n \right|  \quad &\text{if } r_v \leq X_{n+1} \leq \lambda-r_v,\\
+\left| \lambda - r_v - X_n \right|\quad &\text{if }X_{n+1} > \lambda - r_v.
+\end{cases}
+\end{equation*}
+
+We can rewrite \cref{eq:1dRW_cost:Q_sum_q} to obtain an expression for the total cost where the summation limits do not depend on the random variable $\tau$:
+\begin{align}
+Q(x_0) &= \sum_{n=0}^{\tau-1} q(X_n,X_{n+1}) \nonumber \\
+&=\sum_{n=0}^{\infty} \indic_{(\tau \geq n+1)} q(X_n,X_{n+1}).\label{eq:1dRW_cost:Q_rearranged}
+\end{align}
+
+\begin{lemma}
+\label{thm:1dRW_cost:EV}
+The expected value of the total cost is given by
+\begin{equation}
+\label{eq:1dRW_cost:EV}
+\E{Q(x_0)} = \sum_{n=0}^\infty \int_{r_v}^{\lambda-r_v} \rho_n(x_n) \mathbb{E}\left[q(X_n,X_{n+1}) \mid X_n = x_n\right]dx_n,
+\end{equation}
+where $\rho_n(x_n)$ is the probability density function for the forager's location after taking $n$ steps.
+\end{lemma}
+Here, and throughout, we use an explicit notation for the dummy variable of integration, such as $dx_n$ in order to assist with the interpretation of each expression.
+\begin{proof}
+	Taking the expectation of (\cref{eq:1dRW_cost:Q_rearranged}) gives
+	\begin{align*}
+		\E{Q(x_0)} &= \sum_{n=0}^\infty \mathbb{E}\left[\indic_{(\tau \geq n+1)} q(X_{n},X_{n+1})\right]\\
+		&= \sum_{n=0}^\infty \int_{-\infty}^{\infty} \rho_n(x_n) \mathbb{E}\left[ \indic_{(\tau \geq n+1)} q(X_{n},X_{n+1}) \mid X_n = x_n\right] dx_n\\
+		&= \sum_{n=0}^\infty \int_{r_v}^{\lambda - r_v} \rho_n(x_n) \mathbb{E}\left[ q(X_{n},X_{n+1}) \mid X_n = x_n\right] dx_n,
+	\end{align*}
+where the second line follows from the law of total expectation, and the third line is due to the fact that $\indic_{(\tau \geq n+1)}$ will be zero for all $x_n$ outside of $[r_v,\lambda-r_v]$ and will be one for all $x_n$ within this interval.
+\end{proof}
+
+The expression for the average cost of a step, $\mathbb{E}\left[ q(X_{n},X_{n+1}) \mid X_n = x_n\right]$, will of course depend on our definition of cost.
+For all of the definitions that we are interested in, we can find this expectation explicitly (see \cref{sec:1dRW_distance}).
+Thus, we now have only the term $\rho_n(x_n)$ to deal with.
+
+The probability that a forager is at location $x_n$ after taking $n$ steps, is equivalent to the probability that the forager is at $x_{n-1}$ on the previous step, before taking a step of length $x_n-x_{n-1}$, for any starting point $x_{n-1}$. That is,
+\begin{equation}
+\label{eq:1dRW_cost:rho_recursive}
+\rho_n(x_n) = \int_{r_v}^{\lambda-r_v} \rho_{n-1}(x_{n-1}) p(x_n-x_{n-1}) dx_{n-1}.
+\end{equation}
+
+If we apply this recursively, we obtain $n$ integrals for $\rho_n(x_n)$.
+Since we have an infinite sum over $n$, this is going to be difficult to deal with.
+To make it easier, we define an integral operator.
+\begin{definition}
+\label{def:1dRW_cost:integral_operator}
+We define the operator $\L$, which acts on any real-valued function $f : \R \to \R^+$, as
+\begin{equation*}
+\label{eq:1dRW_cost:integral_operator}
+[\L f] (x_n) = \int_{r_v}^{\lambda-r_v} p(x_n-x_{n-1}) f(x_{n-1})  dx_{n-1},
+\end{equation*}
+where $p(x_n-x_{n-1})$ is the probability density of the step length.
+
+In some circumstances we wish to treat the situation in which we have the initial condition $X_0=a$, almost surely. Let $\rho_a$ be the measure defining this initial condition and we explicitly define
+\begin{equation*}
+\label{eq:1dRW_cost:integral_operator_rho}
+[\L \rho_a] (x_n) = \int_{r_v}^{\lambda-r_v} p(x_n-x_{n-1}) \delta(x_{n-1}-a)  dx_{n-1} = p(x_n - a).
+\end{equation*}
+
+Then, $\L^n$ represents the recursive application of the operator $n$ times, that is, $[\L^k f](x) = [\L[\L^{k-1} f]](x)$, etc.
+\end{definition}
+
+
+\begin{theorem}
+	\label{thm:lselfadjoint}
+	The operator $\L$ is self-adjoint.
+\end{theorem}
+\begin{proof}
+	Our operator $\L$ is a Fredholm operator, from \cref{eq:fredholm}, with kernel $p(x-x')$. Since the step-length distribution is symmetric, we get that $p(x-x')=p(x'-x)$ and hence the kernel is symmetric. Therefore, by \cref{thm:fredholmselfadjoint}, $\L$ is self-adjoint.
+\end{proof}
+
+By definition of the operator $\L$ and \cref{eq:1dRW_cost:rho_recursive}, we get the recursive relation
+\begin{equation}
+\label{eq:1dRW_cost:integral_operator_recursive}
+\rho_{n}(x_{n}) = [\L \rho_{n-1}](x_{n}) \quad \text{for }n \geq 0, \, x_n \in \mathbb{R} .
+\end{equation}
+
+\begin{lemma}
+	\label{thm:1dRW_cost:operator_rho0}
+	For any $n \geq 0$,
+	\begin{equation*}
+	\label{eq:1dRW_cost:operator_rho0}
+	\rho_n(x) = [\L^n \rho_0](x)  \quad \text{for } x \in \mathbb{R}.
+	\end{equation*}
+\end{lemma}
+\begin{proof}
+	By induction.
+	Using \cref{eq:1dRW_cost:integral_operator_recursive} we know that the base case, $n=1$, is true
+	\[ [\L \rho_{0}](x) = \rho_1(x). \]
+	Then, for any $k > 1$ we assume
+	\[ [\L^k \rho_0](x) = \rho_k (x) ,\]
+	and for $n=k+1$ we get
+	\begin{align*}
+		[\L^{k+1} \rho_0] (x) &= [\L [\L^k \rho_0 ]](x)= [\L \rho_k](x)= \rho_{k+1}(x),
+	\end{align*}
+	by \cref{eq:1dRW_cost:rho_recursive}.
+\end{proof}
+
+We can substitute this result into \cref{eq:1dRW_cost:EV} to get
+\begin{equation*}
+\label{eq:1dRW_cost:EV2}
+\E{Q(x_0)} = \sum_{n=0}^\infty \int_{r_v}^{\lambda-r_v} [\L^n \rho_0](x_n) \mathbb{E} \left[ q(X_n,X_{n+1}) \mid X_{n}=x_n \right] dx_n.
+\end{equation*}
+Further, since the function $q(X_n,X_{n+1})$ does not depend on $n$ itself but only on two physical points in space we get
+\begin{equation}
+\label{eq:1dRW_cost:EV3}
+\E{Q(x_0)} = \sum_{n=0}^\infty \int_{r_v}^{\lambda-r_v} [\L^n \rho_0](x_n) \mathbb{E} \left[ q(X_0,X_{1}) \mid X_{0}=x_n \right] dx_n.
+\end{equation}
+
+Since the forager's initial position is known to be $x_0 = a$, we can express the probability density function for the forager's initial position as
+\begin{equation*}
+\label{eq:diracdelta_rho0}
+\rho_0(x_0) = \delta(x_0-a),
+\end{equation*}
+where $\delta$ is the Dirac delta function, for which
+\[ \int_\mathcal{A} f(x) \delta(x)dx = \begin{cases}
+0 \quad &\text{if }0 \notin \mathcal{A},\\
+f(0) \quad &\text{if } 0 \in \mathcal{A} \setminus \partial \mathcal{A},\\
+f(0)/2 \quad & \text{if }0 \in \partial \mathcal{A},
+\end{cases} \]
+and constrained to satisfy the identity
+\[\int_{-\infty}^{\infty} \delta(x) dx = 1. \]
+
+\begin{theorem}
+	\label{thm:1dRW_cost:EV_dirac}
+	The expected total cost of a random walk strategy starting at $x_0 = a$ is
+	\begin{equation*}
+		\E{Q(a)} = \sum_{n=0}^\infty \left[ \L^{n}  h\right] (a),
+	\end{equation*}
+	where $h(x) = \mathbb{E} \left[q(X_0, X_{1}) \mid X_0 = x \right]$.
+\end{theorem}
+We note that the proof of \cref{thm:1dRW_cost:EV_dirac} follows fairly simply from the fact that $\L$ is self-adjoint. However, the proof below is presented instead since it more closely matches the proof used for the Markov-modulated case.
+\begin{proof}
+
+We begin with \cref{eq:1dRW_cost:EV3}, and make the substitution $h(x) = \mathbb{E} \left[q(X_0, X_{1}) \mid X_0 = x \right]$, to obtain
+	\begin{equation*}
+	\label{eq:1dRW_cost:EV_0Lapplications}
+		\E{Q(a)} =\sum_{n=0}^\infty \int_{r_v}^{\lambda-r_v} \left[ \L^n \rho_0 \right] (x_n) h(x_n) dx_n.
+	\end{equation*}
+
+First, we separate the $n=0$ term from the rest of the summation. For the remaining terms in the summation, we separate out the final operator that will be applied,
+\begin{equation*}
+		\E{Q(a)} =  \int_{x_0=r_v}^{\lambda-r_v} \rho_0(x_0)h(x_0)dx_0 + \sum_{n=1}^\infty \int_{x_n=r_v}^{\lambda-r_v} \left[\L \left[\L^{n-1} \rho_0 \right]\right] (x_n) h(x_n) dx_n,
+	\end{equation*}
+and then use the definition of $\L$ to get
+\begin{multline*}
+	\E{Q(a)} = \int_{x_0=r_v}^{\lambda-r_v} \rho_0(x_0)h(x_0)dx_0\\+  \sum_{n=1}^\infty \int_{x_n=r_v}^{\lambda-r_v} \int_{x_{n-1}=r_v}^{\lambda-r_v} p(x_n - x_{n-1})\left[\L^{n-1} \rho_0 \right] (x_{n-1})dx_{n-1} h(x_n) dx_n .
+\end{multline*}
+Continuing in this manner, 
+\begin{multline*}
+\E{Q(a)} =  \int_{x_0=r_v}^{\lambda-r_v} \rho_0(x_0)h(x_0)dx_0\\+\sum_{n=1}^\infty \int_{x_n=r_v}^{\lambda-r_v} \cdots \int_{x_0 = r_v}^{\lambda-r_v} \prod_{i=0}^{n-1} p(x_{i+1} - x_{i}) \rho_0 (x_0)h(x_n) dx_{i} dx_n.
+\end{multline*}
+
+We combine the two terms together again, and reverse the order of integrations,
+\begin{equation*}
+\E{Q(a)} =  \sum_{n=0}^\infty \int_{x_0=r_v}^{\lambda-r_v}\rho_0 (x_0) \int_{x_{1}=r_v}^{\lambda-r_v} \cdots \int_{x_n=r_v}^{\lambda-r_v} \prod_{i=0}^{n-1} p(x_{i+1} - x_{i}) h(x_n) dx_n dx_{i}.
+\end{equation*}
+which we are allowed to do according to \Myref{thm:tonellistheorem} and the extension we outlined in \cref{thm:switchintegrals}. We use the fact that both $p(x)$ and $\rho_0(x)$ are \acp{PDF} and therefore are non-negative and measurable, and we know that $h(x)$ is a measurable function since the conditional expectation of a random variable is also a random variable, and is non-negative since $q(X_i,X_{i+1})$ is defined to be non-negative.
+
+Next, we replace $p(x_{i+1} - x_{i})$ with $p(x_{i} - x_{i+1})$ for all $i=0,\dots,n-1$ using the symmetry of the step-length distribution, to arrive at
+\begin{equation*}
+\E{Q(a)} =  \sum_{n=0}^\infty \int_{x_0=r_v}^{\lambda-r_v}\rho_0 (x_0) \int_{x_1=r_v}^{\lambda-r_v} \cdots \int_{x_n=r_v}^{\lambda-r_v} \prod_{i=0}^{n-1} p(x_{i} - x_{i+1}) h(x_n) dx_n dx_{i}.
+\end{equation*}
+
+The inner integral over $x_n$ may be rewritten using the definition of $\L$, giving
+\begin{equation*}
+\label{eq:1dRW_cost:EV_1Lapplications}
+\E{Q(a)} =  \sum_{n=0}^\infty \int_{x_0=r_v}^{\lambda-r_v} \rho_0 (x_0)  \int_{x_1=r_v}^{\lambda-r_v} \cdots \int_{x_{n-1}=r_v}^{\lambda-r_v} \prod_{i=0}^{n-2} p(x_{i} - x_{i+1}) \left[ \L h \right](x_{n-1}) dx_{n-1} dx_{i} .
+\end{equation*}
+
+The next innermost integral, over $x_{n-1}$, can be rewritten to get
+\begin{equation*}
+\label{eq:1dRW_cost:EV_2Lapplications}
+\E{Q(a)} =  \sum_{n=0}^\infty \int_{x_0=r_v}^{\lambda-r_v} \rho_0 (x_0)  \int_{x_1=r_v}^{\lambda-r_v} \cdots \int_{x_{n-2}=r_v}^{\lambda-r_v} \prod_{i=0}^{n-3} p(x_{i} - x_{i+1}) \left[ \L^2 h\right](x_{n-2}) dx_{n-2} dx_{i}.
+\end{equation*}
+Continuing in this manner results in
+\begin{equation*}
+\label{eq:1dRW_cost:EV_nLapplications}
+\E{Q(a)} =  \sum_{n=0}^\infty \int_{x_0=r_v}^{\lambda-r_v} \rho_0 (x_0)  \left[ \L^n h\right](x_{0}) dx_{0}.
+\end{equation*}
+Now, we substitute in the Dirac delta function for the forager's initial location,
+\begin{equation*}
+\label{eq:1dRW_cost:EV_diracdelta}
+\E{Q(a)} = \sum_{n=0}^\infty \int_{x_{0}=r_v}^{\lambda-r_v} \left[ \L^n h \right](x_{0})  \delta(x_0-a) dx_{0},
+\end{equation*}
+and evaluate this integral to get
+\begin{equation}
+\label{eq:1dRW_cost:EQ_sum_final}
+\E{Q(a)} = \sum_{n=0}^\infty \left[ \L^n h \right](a),
+\end{equation}
+which completes the proof.
+
+\end{proof}
+
+To simplify this expression further, we must first prove some results about the operator norm of $\L$. In particular, for \cref{eq:1dRW_cost:EQ_sum_final} to converge, we must show that $\L$ has an operator norm less than unity, which we will build up to over the next few \lcnamecref{thm:1dRW_cost:Q_operator_norm_lmax}s.
+
+
+
+\begin{lemma}
+	\label{thm:1dRW_cost:Q_operator_norm_lmax}
+	For step-length distributions with $\lmax > \lambda/2 -r_v$, $\normop{\L} < 1$, where $\normop{\cdot}$ is the operator norm.
+\end{lemma}
+	
+\begin{proof}
+Recall from \cref{def:operator_norm} the definition of the operator norm is
+\begin{equation*}
+\normop{\L} = \sup \left\{ \frac{\norm{\L f}}{\norm{f}}:  \norm{f} \neq 0 \right\},
+\end{equation*}
+where, in this case, we choose $\norm{\cdot}$ to be the uniform norm, given by
+\begin{equation*}
+\norm{f}_{\infty} = \sup\{\left| f(x) \right| : x \in (r_v,\lambda-r_v) \}.
+\end{equation*}
+
+Then, 
+\begin{align*}
+[\L f](x) &= \int_{r_v}^{\lambda-r_v} p(x'-x)  f(x')  dx'\\
+&\leq C \int_{r_v}^{\lambda-r_v} p(x'-x) dx',
+\end{align*}
+where $C:=\norm{f}_{\infty}$.
+
+We can rewrite this integral as two integrals, representing steps to either the left or the right, giving us
+\begin{equation*}
+[\L f](x) \leq C \left(\int_{\lmin}^{x-r_v} p(\ell) d\ell + \int_{\lmin}^{\lambda-r_v-x}p(\ell)d\ell \right).
+\end{equation*}
+If $\lmax \leq x-r_v$, then every possible step to the left must land within $[r_v,\lambda-r_v]$, and so the first integral will evaluate to $0.5$. If $\lmax > x-r_v$ then there is a nonzero probability that a step to the left will land beyond the boundary and so the first integral will evaluate to something less than $0.5$. Similarly, if $\lmax \leq \lambda-r_v-x$ the right integral will evaluate to $0.5$, and if $\lmax > \lambda-r_v-x$ the right integral will evaluate to something less than $0.5$. Thus, we get that
+\begin{equation*}
+[\L f](x) \leq \begin{cases}
+C \quad &\text{if }\lmax \leq x-r_v \text{ and } \lmax \leq \lambda-r_v-x,\\
+C^* < C &\text{otherwise}.
+\end{cases}
+\end{equation*}
+Rearranging the conditions on $\lmax$, we get
+\begin{equation*}
+[\L f](x) \leq \begin{cases}
+C \quad &\text{if }\lmax + r_v \leq x \leq \lambda-r_v-\lmax,\\
+C^* < C &\text{otherwise}.
+\end{cases}
+\end{equation*}
+Note that if $\lmax > \lambda/2-r_v$, then there are no values of $x$ that satisfy $\lmax + r_v \leq x \leq \lambda-r_v-\lmax$. So, for $\lmax > \lambda/2 -r_v$,
+\begin{equation*}
+[\L f](x) \leq C^* \text{ for all }x \in [r_v,\lambda-r_v],
+\end{equation*} 
+which implies that
+\begin{equation*}
+\norm{\L f}_\infty \leq C^* < C.
+\end{equation*}
+Therefore, for $\lmax > \lambda/2 -r_v$,
+\begin{equation*}
+\frac{\norm{\L f}_\infty}{\norm{f}_\infty} \leq \frac{C^*}{C} < 1,
+\end{equation*}
+and so by the definition of the operator norm we get $\normop{\L}<1$.
+\end{proof}
+
+Using \cref{thm:1dRW_cost:Q_operator_norm_lmax}, we know that the operator norm is less than $1$ for some step-length distributions with a large enough $\lmax$ value. Note that the condition on $\lmax$ in \cref{thm:1dRW_cost:Q_operator_norm_lmax} is a sufficient condition and not a necessary condition. There may exist some distributions with $\lmax \leq \lambda/2-r_v$ for which $\normop{\L}<1$. In fact, as the next few \lcnamecref{thm:1dRW_cost:Q_operator_norm_Lk}s show, there definitely is. We now prove some results for the operator under more relaxed conditions of $\lmax$.
+
+\begin{lemma}
+	\label{thm:1dRW_cost:Q_operator_norm_Lk}
+	For step-length distributions with $\lmax > \frac{\lambda -2r_v}{2^k}$, for $k \geq 1$, $\normop{\L^k} < 1$, where $\normop{\cdot}$ is the operator norm.
+\end{lemma}
+
+\begin{proof}
+	In the same manner as the proof of \cref{thm:1dRW_cost:Q_operator_norm_lmax}, we could write the integrals corresponding to $[\L^k f](x)$ and rearrange these. However, we can note that over $k$ steps, the maximum possible distance that a forager can travel from its starting point in either direction is $k\lmax$. Thus, a forager beginning at some position $x$ that is within $k\lmax$ of either boundary has a non-zero probability of reaching a food target. Then, as with the the proof of \cref{thm:1dRW_cost:Q_operator_norm_lmax} we can write 
+	\begin{equation*}
+	[\L^k f](x) \leq \begin{cases}
+	C \quad &\text{if }k\lmax \leq x-r_v \text{ and } k\lmax \leq \lambda-r_v-x,\\
+	C^* < C &\text{otherwise},
+	\end{cases}
+	\end{equation*}
+	where, once again, $C:= \norm{f}_{\infty}$. Rearranging the conditions, we get
+		\begin{equation*}
+	[\L^k f](x) \leq \begin{cases}
+	C \quad &\text{if }k\lmax + r_v \leq x \leq \lambda-r_v-k\lmax,\\
+	C^* < C &\text{otherwise}.
+	\end{cases}
+	\end{equation*}
+	Then, if $\lmax > \frac{\lambda-2r_v}{2^k}$, for some $k \geq 1$, then there are no values of $x$ which satisfy $k\lmax + r_v \leq x \leq \lambda-r_v-k\lmax$. So if $\lmax > \frac{\lambda-2r_v}{2^k}$, for some $k\geq 1$,
+	\begin{equation*}
+	[\L^k f](x) \leq C^* \text{ for all }x \in [r_v,\lambda-r_v]
+	\end{equation*}
+	which implies that 
+	\begin{equation*}
+	\norm{\L f}_\infty \leq C^* < C.
+	\end{equation*}
+	Therefore, for $\lmax > \frac{\lambda-2r_v}{2^k}$, for some $k \geq 1$,
+	\begin{equation*}
+	\frac{\norm{ \L^k f}_\infty}{\norm{f}_\infty} \leq \frac{C^*}{C} < 1,
+	\end{equation*}
+	and so by definition of the operator norm we get $\normop{\L^k} < 1$.
+\end{proof}
+
+As with \cref{thm:1dRW_cost:Q_operator_norm_lmax}, the condition on $\lmax$ in \cref{thm:1dRW_cost:Q_operator_norm_Lk} is also a sufficient condition but not a necessary condition.
+\begin{remark}
+	\label{thm:1dRW_cost:Q_operator_norm_alternate}
+	\cref{thm:1dRW_cost:Q_operator_norm_lmax,thm:1dRW_cost:Q_operator_norm_Lk} are also true if we instead use the operator norm induced by
+	\begin{equation*}
+	\norm{f}_1 = \int_{r_v}^{\lambda-r_v} \lvert f(x) \rvert dx.
+	\end{equation*}
+	Consider
+	\begin{align}
+	\norm{\L f}_1 &= \int_{r_v}^{\lambda-r_v} \lvert [\L f](x) \rvert dx \nonumber\\
+	&=\int_{r_v}^{\lambda-r_v} \left| \int_{r_v}^{\lambda-r_v} p(x-x')f(x')dx' \right| dx \nonumber\\
+	&=\int_{r_v}^{\lambda-r_v} f(x') \int_{r_v}^{\lambda-r_v} p(x-x')dx dx', \label{eq:1dRW_cost:Q_operator_norm_remark}
+	\end{align}
+	where the order of integration is exchanged by the exact same justification as in the proof of \cref{thm:1dRW_cost:EV_dirac}.
+	Then, $\norm{\L f}_1$ will be strictly less than $\norm{f}_1$ under the same conditions as \cref{thm:1dRW_cost:Q_operator_norm_lmax}, and for the same reasons. \cref{thm:1dRW_cost:Q_operator_norm_Lk} follows similarly.
+\end{remark}
+%The following \lcnamecref{thm:1dRW_cost:Q_operator_norm_recursive} shows that if $\normop{\L^k}<1$ then $\normop{\L}<1$. 
+
+\begin{lemma}
+	\label{thm:1dRW_cost:Q_operator_norm_recursive}
+	If $\normop{\L^k}<1$, for $k=2^n$ where $n$ is some positive integer, then $\normop{\L}<1$.
+\end{lemma}
+\begin{proof}
+We know that $\L$ is self-adjoint by \cref{thm:lselfadjoint}. Then using \cref{thm:composedopnorm} we know that $\normop{\L^k}=\normop{\L}^k$ . Then, 
+\begin{equation*}
+\normop{\L^k}<1 \iff \normop{\L}^k < 1 \iff \normop{\L} < 1,
+\end{equation*}
+which completes the proof.
+\end{proof}
+
+\begin{remark}
+Not only is \cref{thm:1dRW_cost:Q_operator_norm_recursive}  true for all values of $\lmax$, but $\L$ can actually be any self-adjoint linear operator, not necessarily the linear operator $\L$ that we have defined.
+This is important because we shall also use \cref{thm:1dRW_cost:Q_operator_norm_recursive} in \cref{sec:1d_discrete}.
+\end{remark}
+
+Now, we can present a \lcnamecref{thm:1dRW_cost:Q_operator_norm} that is a stronger version of \cref{thm:1dRW_cost:Q_operator_norm_lmax}, since it no longer has any requirements on $\lmax$.
+\begin{lemma}
+	\label{thm:1dRW_cost:Q_operator_norm}
+	For the operator $\L$ defined in \cref{def:1dRW_cost:integral_operator}, $\normop{\L} < 1$.
+\end{lemma}
+
+\begin{proof}
+	First note that for any value of $\lmax$, we can choose a value of $k$ such that $\normop{\L^k} < 1$ using \cref{thm:1dRW_cost:Q_operator_norm_Lk}, since $ \frac{\lambda-2r_v}{2^k}$ is decreasing to zero and $\lmax > 0$. 
+	
+	%Further, since by definition $\lmax \geq \lmin$, we can choose some $k$ such that $\frac{\lambda-2r_v}{2^k} < \lmin$, to ensure that $\normop{\L^k} < 1$ for every possible value of $\lmax$. The smallest value of $k$ that satisfies this is
+	%\begin{equation*}
+	%k^* = \left\lfloor \log_2 \left( \frac{\lambda-2r_v}{\lmin} \right) + 1\right\rfloor.
+	%\end{equation*}
+	Then, we know that $\normop{\L^{k}}<1$ for every possible value of $\lmax$ and hence every possible step-length distribution. 
+	However, to use \cref{thm:1dRW_cost:Q_operator_norm_recursive} we require a $k^*$ of the form $2^n$ for some positive integer $n$. Thus, we let $k^* = \min\left\{ 2^n : 2^n \geq k \right\}$, for which we also have $\normop{\L^{k^*}}<1$ for every step-length distribution. Then, we can use \cref{thm:1dRW_cost:Q_operator_norm_recursive} to conclude that $\normop{\L} < 1$.
+\end{proof}
+
+\begin{theorem}
+	\label{thm:1dRW_cost:Q_neumann}
+	\Cref{eq:1dRW_cost:EQ_sum_final} is a convergent Neumann series and can be rewritten as
+	\begin{equation}
+		\label{eq:1dRW_cost:Q_neumann}
+		\E{Q(a)} = \left[ (\Id - \L)^{-1} h \right](a),
+	\end{equation}
+	where $h(x) = \mathbb{E}_{X_1 \mid X_0} \left[q(X_0, X_{1}) \mid X_0 = x \right]$.
+\end{theorem}
+
+\begin{proof}
+
+	From \cref{thm:1dRW_cost:Q_operator_norm}, we know that the operator norm of $\L$ is strictly less than unity. Therefore, by \cref{thm:neumannseries},
+	\begin{equation}
+	\label{eq:1dRW_cost:L_neumann}
+		\left[ (\Id - \L)^{-1} f \right] = \sum_{n=0}^\infty \left[ \L^n f \right],
+	\end{equation}
+	for any function $f$, where $\Id$ is the identity operator.
+	Now, recall \cref{eq:1dRW_cost:EQ_sum_final} is
+		\begin{equation*}
+		\E{Q(a)} = \sum_{n=0}^\infty \left[ \L^{n} h\right](a),
+		\end{equation*}
+		and so \cref{eq:1dRW_cost:L_neumann} implies that
+	\begin{equation*}
+	\E{Q(a)} = \left[(\Id - \L)^{-1} h\right](a),
+	\end{equation*}
+	which completes the proof.
+\end{proof}
+It is worth noting that the same Neumann series may be applied to \cref{eq:1dRW_cost:EV2} to give
+\begin{equation}
+\label{eq:1dRW_cost:EV2_neumann}
+\E{Q(x_0)} = \int_{r_v}^{\lambda-r_v} [(\Id - \L)^{-1} \rho_0](x_n) h(x_n) dx_n.
+\end{equation}
+After discretisation of the search space, both this expression and \cref{eq:1dRW_cost:Q_neumann} are sufficient to numerically determine the total cost. Although \cref{eq:1dRW_cost:EV2_neumann} is not as simple analytically, there is no significant difference in computation time (see \cref{sec:1d_discrete}) when compared to \cref{eq:1dRW_cost:Q_neumann}.
+
+\end{subsection}
+\begin{subsection}{Average total distance travelled\label{sec:1dRW_distance}}
+
+We now use the results of the previous section to determine the average total distance travelled by a forager undergoing a random walk strategy.
+Since we are concerned only with distance travelled, and not direction, we can take absolute values of the step size, giving us the untruncated cost function
+\begin{equation*}
+\label{eq:1dRW_dist:q_untruncated}
+	q^*(X_i,X_{i+1}) := |X_{i+1} - X_i|,
+\end{equation*}
+where $X_i$ is the position of the forager after taking $i$ steps.
+Then, the cost function becomes
+\begin{equation}
+\label{eq:1dRW_dist:q}
+q(X_i,X_{i+1}) = \begin{cases}
+\left| r_v - X_i \right| \quad &\text{if }X_{i+1} < r_v,\\
+\left| X_{i+1} - X_i \right|  \quad &\text{if } r_v \leq X_{i+1} \leq \lambda-r_v,\\
+\left| \lambda - r_v - X_i \right|\quad &\text{if }X_{i+1} > \lambda - r_v.
+\end{cases}
+\end{equation}
+
+Using this definition of cost, the total cost, $Q(x_0)$, represents the total distance travelled to detect a food patch.
+However, we may also want to consider the distance needed to actually reach the food after detecting it.
+Thus, the total distance travelled will be
+\begin{equation*}
+\label{eq:1dRW_dist:L}
+L(x_0) = Q(x_0) + r_v,
+\end{equation*}
+since the forager detects the food a distance $r_v$ away, and moves directly towards it.
+When taking the expected value, the constant term remains as a constant term
+\begin{equation*}
+\label{eq:1dRW_dist:EL}
+\E{L(x_0)} = \E{Q(x_0)} + r_v.
+\end{equation*}
+The inclusion of the constant term, $r_v$, is of little significance when determining the optimal efficiency, but we include it for completeness.
+
+Recalling that the forager begins at $x_0 = a$, and using \cref{eq:1dRW_cost:Q_neumann}, we get
+\begin{equation*}
+\label{eq:1dRW_dist:EL_neumann}
+\E{L(x_0)} = \left[ (\Id - \L)^{-1} h\right](a) + r_v,
+\end{equation*}
+where $h(x) = \mathbb{E}_{X_1 \mid X_0} \left[q(X_0,X_1) \mid X_0 = x \right]$.
+
+Note, that this result is the same as the result from Bartumeus \etal \cite{Bartumeus_2013}, with some differences in notation.
+They have denoted the expected distance travelled on the $i$th step, given the step began at $x_{i-1}$, as $\langle|\ell_i(x_{i-1})|\rangle$, as opposed to our expression $h(x_{i-1})$.
+As mentioned earlier, there is no dependence on $i$ and so this becomes $\langle \abs{\ell}\rangle$.
+They have also not included the $r_v$ term, and instead consider the distance travelled to \emph{detect} a food patch, rather than to \emph{reach} a food patch.
+
+Making these notational changes results in
+\begin{equation*}
+\label{eq:1dRW_dist:bartumeus_EL}
+\langle L \rangle(a) = [(\Id - \L)^{-1} \langle \abs{\ell}\rangle](a),
+\end{equation*}
+which matches Equation~(24) found by Bartumeus \etal \cite{Bartumeus_2013}.
+
+The expectation term, $h$, to which the operator is applied can be solved similarly to a normal expectation, but we must take into consideration the possibility of truncation.
+We consider distributions that have a parameter representing the minimum step-size, $\lmin$, such as the power-law distribution.
+The existence of an $\lmin>0$ was a crucial part of \cref{thm:1dRW_cost:Q_operator_norm} and hence required to show that the Neumann series would converge.
+However, we can still consider step-length distributions with $\lmin=0$ as long as $\lmax > \lmin$, where the strict inequality is now needed so that $\lmax \neq 0$ to ensure convergence.
+
+When evaluating $h$, we must separate the integral into separate cases depending on whether or not truncation occurs, according to \cref{eq:1dRW_dist:q}.
+Thus, we get
+\begin{align*}
+h(a) &= \mathbb{E} \left[q(X_0,X_1) \mid X_0 = a \right]\\
+&=\int_{-\infty}^{\infty} q(a,x) p(x-a)dx\\
+&=\int_{-\infty}^{r_v}\abs{r_v-a} p(x-a)dx + \int_{r_v}^{\lambda-r_v}\abs{x-a} p(x-a)dx + \int_{\lambda-r_v}^\infty \abs{\lambda - r_v-a} p(x-a)dx.
+\end{align*}
+The first integral represents steps to the left that are truncated at the boundary, the second integral represents steps that do not reach a boundary and so are not truncated, and the third integral represents steps to the right that are truncated.
+We now break the middle integral into two integrals representing steps that are not truncated, and move to either the left or to the right, and also introduce a minimum step-size $\lmin \geq 0$, so
+\begin{align*}
+h(a) &= \int_{-\infty}^{r_v}\abs{r_v-a} p(x-a)dx + \int_{r_v}^{a-\lmin}\abs{x-a} p(x-a)dx \\
+&+ \int_{a+\lmin}^{\lambda-r_v}\abs{x-a} p(x-a)dx + \int_{\lambda-r_v}^\infty \abs{\lambda - r_v-a} p(x-a)dx.
+\end{align*}
+Note that this is only valid for $r_v + \lmin \leq a \leq \lambda - r_v - \lmin$, since otherwise the other limits of integration will also need to be adjusted.
+These cases are considered in \cref{app:calc:ave_length}, as well as consideration of a maximum step-size, $\lmax \geq \lmin$, and obtaining simplified expressions for $h$ for a range of different step-length distributions.
+Finally, we rearrange the integrals to give
+\begin{multline}
+\label{eq:1dRW_dist:l_integrals}
+h(a)  = \int_{r_v}^{a-\lmin} (a-x)p(x-a)dx + \int_{a+\lmin}^{\lambda-r_v} (x-a) p(x-a) dx\\
+ + (a-r_v) \int_{-\infty}^{r_v} p(x-a)dx + (\lambda-r_v-a)\int_{\lambda-r_v}^{\infty} p(x-a)dx,
+\end{multline}
+which is valid for $r_v + \lmin \leq a \leq \lambda - r_v - \lmin$.
+
+By substituting $\ell=x-a$, we can write \cref{eq:1dRW_dist:l_integrals} as
+\begin{multline}
+\label{eq:1dRW_dist:l_integralsv2}
+h(a) = \int_{-(a-r_v)}^{-\lmin} |\ell| p(\ell)d\ell + \int_{\lmin}^{\lambda-r_v-a} \ell p(\ell) d\ell\\
++ (a-r_v) \int_{-\infty}^{-(a-r_v)} p(\ell)d\ell + (\lambda-r_v-a)\int_{\lambda-r_v-a}^{\infty} p(\ell)d\ell.
+\end{multline}
+The key difference between these two representations is that the ranges of integration in \cref{eq:1dRW_dist:l_integrals} represent the locations where the forager steps to, whereas in \cref{eq:1dRW_dist:l_integralsv2} they represent the distance that the forager travels.
+
+If we denote the \ac{CDF} of the step-length as $F_{\ell}(x)$, then using the symmetry of our step-length distribution we can rewrite \cref{eq:1dRW_dist:l_integralsv2} as
+\begin{multline*}
+\label{eq:1dRW_dist:l_integralsv2_cdf}
+h(a) = \int_{-(a-r_v)}^{-\lmin} |\ell| p(\ell)d\ell + \int_{\lmin}^{\lambda-r_v-a} \ell p(\ell) d\ell\\
++ (a-r_v) F_{\ell}(-(a-r_v)) + (-(\lambda-r_v-a)) F_{\ell}(\lambda-r_v-a).
+\end{multline*}
+
+Our final result for the average total step length, \cref{eq:1dRW_dist:EL_neumann}, cannot be solved analytically for most choices of step-length distribution.
+Therefore, we discuss how it can be solved numerically in \cref{sec:1d_discrete}.
+
+\end{subsection}
+
+\begin{subsection}{Average number of steps \label{sec:1dRW_steps}}
+
+Previously we let $\tau$ be the time until a target was first found. Now we want to find $\E{\tau}$, and we note that in this context $\tau$ is usually denoted $N$.
+We can now use \cref{thm:1dRW_cost:Q_neumann}, which gives the expression for the expected total cost, to determine $\E{\tau}$.
+In this case, each step regardless of start or end location has a cost of~$1$.
+We also do not need to consider the constant term, $r_v$, as we did in determining the distance, since it is assumed that after detecting the food patch the animal moves directly to it without reorientation, and therefore incurs no further cost.
+
+Once again, using \cref{eq:1dRW_cost:Q_neumann} from \cref{sec:1dRW_cost} we obtain
+\begin{equation*}
+\label{eq:1dRW_steps:N}
+\E{\tau(a)} = [(\Id - \L)^{-1} 1],
+\end{equation*}
+where the `$1$' is included just to make it clear that the operator is applied to a constant $1$.
+As with the average total distance travelled, this expression cannot be solved analytically so we discuss solving this numerically in \cref{sec:1d_discrete}.
+
+\end{subsection}
+\end{section}
+

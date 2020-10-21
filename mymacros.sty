@@ -1,0 +1,204 @@
+\ProvidesPackage{mymacros}[2018/02/25 v1.0 My own macros]
+
+
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\RequirePackage[english]{babel}
+\RequirePackage{textcomp}
+\RequirePackage{graphicx,amsmath,amsthm,mathrsfs,amssymb,mathtools,amsbsy}
+%\RequirePackage{mathdesign}
+\RequirePackage{float}
+\RequirePackage{tikz,pgfplots}
+\RequirePackage{units}
+\RequirePackage{ifthen}
+\RequirePackage{siunitx}
+\usetikzlibrary{calc}
+\pgfplotsset{compat=1.13}
+\RequirePackage{parskip}
+\graphicspath{{figures/}}
+\RequirePackage{placeins}
+\RequirePackage{microtype,color}
+\RequirePackage{varioref}
+\RequirePackage{hyperref}
+\RequirePackage[noabbrev,nameinlink,capitalise]{cleveref}
+\RequirePackage[font={small,it}]{caption}
+\RequirePackage{subfig}
+\RequirePackage{newclude}
+\RequirePackage{titlesec}
+\RequirePackage{epigraph}
+%\RequirePackage{ebgaramond}
+\RequirePackage{fancyhdr}
+\RequirePackage[nolist,nohyperlinks]{acronym}
+\RequirePackage{csquotes}
+\RequirePackage{lmodern}
+
+\RequirePackage{etoolbox}
+%\let\oldforlistloop\forlistloop
+%\usepackage{newtxmath}
+%\let\forlistloop\oldforlistloop
+%\let\globcount\newcount
+
+%\mathtoolsset{
+%	showonlyrefs,
+%}
+
+
+\makeatother
+\RequirePackage{bbm}
+\hypersetup{
+	colorlinks={false}
+}
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\allowdisplaybreaks
+
+%-----------------------------------------------------------------------
+% theorems, lemma etc
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{question}[theorem]{Question}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\theoremstyle{remark}
+\newtheorem{example}{Example}[section]
+\newtheorem{note}{Note}[section]
+\newtheorem{exercise}{Exercise}[section]
+
+
+
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+
+% ------------------------------------------------------------------------
+\DeclareMathAlphabet{\mathscrbf}{OMS}{mdugm}{b}{n}
+
+\newcommand{\Var}[1]{\operatorname{Var}\left[#1\right]}
+\newcommand{\Cov}[1]{\operatorname{Cov}\left[#1\right]}
+\newcommand{\E}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\diag}[1]{\mathop{\mathrm{diag}}\left(#1\right)}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Id}{\mathrm{Id}}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+\newcommand{\normop}[1]{\norm{#1}_{op}}
+\newcommand{\statespace}{\mathcal{S}}
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\renewcommand{\L}{\mathscr{L}}
+\newcommand{\Lmat}{{\mathscrbf{L}}}
+\newcommand{\Lalt}{\L^*}
+\newcommand{\Laltmat}{{\Lmat^*}}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\lmin}{\ell_{\min}}
+\newcommand{\Amin}{A_{\min}}
+\newcommand{\lmax}{\ell_{\max}}
+\newcommand{\etal}{\emph{et al. }}
+\newcommand{\Ptrans}{\mathbb{P}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\normone}[1]{\left|\left|#1\right|\right|_1}
+\newcommand{\indic}{\mathbbm{1}}
+\newcommand{\identity}{\mathbb{I}}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\newcommand{\Tr}[1]{\mathrm{Tr}\left(#1\right)}
+
+\makeatletter
+\newcommand{\myref}[1]{\cref{#1}\mynameref{#1}{\csname r@#1\endcsname}}
+\newcommand{\Myref}[1]{\Cref{#1}\mynameref{#1}{\csname r@#1\endcsname}}
+
+\def\mynameref#1#2{%
+	\begingroup
+	\edef\@mytxt{#2}%
+	\edef\@mytst{\expandafter\@thirdoffive\@mytxt}%
+	\ifx\@mytst\empty\else
+	\space(\nameref{#1})\fi
+	\endgroup
+}
+\makeatother
+
+\makeatletter
+\def\thm@space@setup{%
+	\thm@preskip=\parskip \thm@postskip=0pt
+}
+\makeatother
+
+\renewcommand\textflush{flushright}
+
+\makeatletter
+\newlength\epitextskip
+\pretocmd{\@epitext}{\em}{}{}
+\apptocmd{\@epitext}{\em}{}{}
+\patchcmd{\epigraph}{\@epitext{#1}\\}{\@epitext{#1}\\[\epitextskip]}{}{}
+\makeatother
+
+
+\setlength\epigraphrule{0pt}
+\setlength\epitextskip{2ex}
+\setlength\epigraphwidth{.8\textwidth}
+
+\makeatletter
+\renewcommand*\l@figure{\@dottedtocline{1}{1em}{3.2em}}
+\makeatother
+
+% chapter heading formatting
+\titleformat{\chapter}[display]
+{\normalfont\LARGE\sffamily}{\chaptertitlename\ \thechapter}{0pt}
+{\titlerule\vskip2pt\titlerule\vskip20pt\Huge\bfseries\filleft}
+% section heading formatting
+\titleformat{\section}
+{\normalfont\Large\bfseries\sffamily}{\rule[.12ex]{8pt}{8pt}~\thesection}{0.5em}{}
+\titleformat{\subsection}
+{\normalfont\large\bfseries\sffamily}{\rule[.12ex]{8pt}{8pt}~\thesubsection}{0.5em}{}
+
+% header/footer
+\fancyhf{}
+\fancyhead[ER]{\footnotesize\sffamily\leftmark}
+\fancyhead[OL]{\footnotesize\sffamily\nouppercase\rightmark}
+\fancyhead[EL,OR]{\bfseries\thepage}
+
+% redefinition of the plain style
+\fancypagestyle{plain}{%
+	\fancyhf{}
+	\fancyfoot[R]{\bfseries\thepage}
+	\renewcommand{\headrulewidth}{0pt}
+}
+\renewcommand\sectionmark[1]{%
+	\markright{Sec.~\thesection.\quad#1}}
+
+\begin{acronym}[MLE]
+\acro{MLE}[MLE]{maximum likelihood estimation}
+\end{acronym}
+\acrodefplural{MLE}[MLEs]{maximum likelihood estimates}
+\begin{acronym}[AIC]
+	\acro{AIC}[AIC]{Akaike's Information Criterion}
+\end{acronym}
+\begin{acronym}[MSD]
+	\acro{MSD}[MSD]{mean square displacement, or root mean square fluctuation}
+\end{acronym}
+\begin{acronym}[SSM]
+	\acro{SSM}[SSM]{state space model}
+\end{acronym}
+\acrodefplural{SSM}[SSMs]{state space models}
+\begin{acronym}[HMM]
+	\acro{HMM}[HMM]{hidden Markov model}
+\end{acronym}
+\acrodefplural{HMM}[HMMs]{hidden Markov models}
+\begin{acronym}[CLT]
+	\acro{CLT}[CLT]{Central Limit Theorem}
+\end{acronym}
+\begin{acronym}[PDF]
+	\acro{PDF}[PDF]{probablity density function}
+\end{acronym}
+\acrodefplural{PDF}[PDFs]{probability density functions}
+\begin{acronym}[CDF]
+	\acro{CDF}[CDF]{cumulative distribution function}
+\end{acronym}
+\acrodefplural{CDF}[CDFs]{cumulative distribution functions}

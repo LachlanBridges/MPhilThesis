@@ -1,0 +1,624 @@
+ %!TEX root = ../thesis.tex
+\begin{section}{Markov-modulated random walk strategies\label{sec:1dMMRW}}
+
+As discussed in \cref{sec:introduction}, by considering a Markov-modulated random walk strategy, we can generalise many of the other search strategies that have been investigated, as well as consider other new strategies.
+
+We begin by considering a Markov-modulated random walk strategy, which is similar to the random walk strategy from \cref{sec:1dRW}, but now the step-length distribution of the random walk depends on the state of a discrete-time Markov chain, $Z$, with a state space that we denote as $\statespace$.
+We assume that the change of state of $Z$ occurs after a step has already been finished, but before the next step begins.
+We say $J$ is the number of states in $\statespace$, that is $|\statespace| = J$, where $J$ is finite, and let $Z_n$ be the state of $Z$ after taking $n$ steps (equivalently at the beginning of the $n+1$th step).
+Thus, for each state $j=1,\dots,J$, we have a corresponding probability distribution $p_j(\ell)$ from which the length of a step is determined, rather than a single distribution as in the random walk strategy.
+We also allow for the forager's radius of vision to change depending on the state of $Z$, which we denote as $r_j$ while $Z$ is state $j$.
+We denote the transition matrix of $Z$ as $P(x)$, where $x$ is the current location of the forager.
+From \cref{thm:1dMMRW_cost:EV_Qj_sum} onwards, to proceed any further we are forced to make the assumption that the transition matrix does not depend on the current location, that is, $P(x) = P(y)$ for all $x,y \in [0,\lambda]$, in which case we can denote the transition matrix as $P$.
+
+The more general case, with the transition matrix depending on $x$, would allow us to model location-aware foragers, such as done by Nolting \cite{Nolting_2013}.
+Our first expression for the expected total cost, \cref{eq:1dMMRW_cost:Qj_neumann}, allows for $P$ to be a function of $x$.
+
+As before, we are considering an overall search space $[0, \lambda]$.
+We maintain the meaning of $X_i$, $x_i$, and $\ell_i$ from \cref{sec:1dRW}.
+We assume that the forager begins at a known location $x_0=a$, for some $a \in (0,\lambda)$.
+However, we do not make any assumption about what state the underlying Markov chain, $Z$, begins in.
+We are not able to reduce the search space to $[r_v,\lambda-r_v]$ since the radius of vision is not a constant as in the unmodulated scenario.
+
+Once again, we begin by deriving an expression for the expectation of the total cost, and then show how this can be used to determine the average distance travelled and the average number of steps taken.
+Ideally, we would like an expression for the expectation of the total cost incurred in any given state, which, by summation over each state, will also give us an expression for the expectation of the total cost overall.
+We achieve this in the following section, although the expression for the total cost incurred in a single state (\cref{eq:1dMMRW_cost:Qj_neumann}) does not incorporate the Dirac delta for the starting location, and the final expression (\cref{eq:1dMMRW_cost:Q_Ln_hz}) which incorporates the Dirac delta can only be used to find the total cost incurred in all states, and not a single state individually.
+
+\begin{subsection}{Total cost of a Markov-modulated strategy\label{sec:1dMMRW_cost}}
+
+We define $Q_j(x_0)$ to be the total cost that is accumulated in state $j$ to detect a food target.
+This is the sum of the costs of all steps taken while in state $j$.
+
+We define $q^*_j(x_n,x_{n+1})$ to be the \emph{untruncated} cost function for a step at the \emph{beginning} of which $Z$ is in state $j$ and the forager begins at location $x_n$, and ends at location $x_{n+1}$.
+Then, as in the unmodulated case, we can define the true cost function, for each $j \in \statespace$, as
+\begin{equation*}
+\label{eq:1dMMRW_cost:cost_truncation}
+q_j(X_n,X_{n+1}) = \begin{cases}
+q^*_j(X_n,r_j) \quad &\text{if }X_{n+1} < r_j,\\
+q^*_j(X_n,X_{n+1})  \quad &\text{if } r_j \leq X_{n+1} \leq \lambda-r_j,\\
+q^*_j(X_n,\lambda - r_j) \quad &\text{if }X_{n+1} > \lambda - r_j.
+\end{cases}
+\end{equation*}
+
+The total cost accumulated in state $j$ is then given by
+\begin{equation}
+\label{eq:1dMMRW_cost:total_cost_state}
+Q_j(x_0) = \sum_{n=0}^{\tau-1} \indic_{(Z_{n}=j)} q_j(X_{n},X_{n+1}).
+\end{equation}
+Due to the indicator function, a cost is attributed to a state only if the Markov chain begins in that state.
+Once again, $\tau$ is the stopping time representing the time until the forager first detects a target.
+
+Then, the total cost accumulated regardless of state is
+\begin{equation*}
+	\label{eq:1dMMRW_cost:total_cost}
+	Q(x_0) = \sum_{j=1}^J Q_j(x_0).
+\end{equation*}
+
+We can rewrite \cref{eq:1dMMRW_cost:total_cost_state} to remove the random variable $\tau$ from the summation limits, by introducing another indicator function,
+\begin{align}
+Q_j(x_0) &= \sum_{n=0}^{\tau -1} \indic_{(Z_{n}=j)} q_j(X_n,X_{n+1}) \nonumber \\
+&= \sum_{n=0}^{\infty} \indic_{(Z_{n}=j)} q_j(X_n,X_{n+1}) \indic_{(\tau \geq n + 1)}. \label{eq:1dMMRW_cost:Q_rearranged}
+\end{align}
+
+Recall from the random walk strategy in \cref{sec:1dRW}, the probability density of the forager's location after taking $n$ steps was denoted $\rho_n(x_n)$.
+For the Markov-modulated random walk, we must also take into account the current state of the Markov chain $Z$, hence we define $\rho_{n,j}(x_n)$ as the probability density of the forager being at location $x_n$ and $Z$ being in state $j$ after taking $n$ steps ($Z_{n}=j$).
+Then we can define the vector
+\begin{equation}
+	\label{eq:1dMMRW_cost:rho_vector}
+	\vec{\rho_n}(x_n) = (\rho_{n,1}(x_n),\dots,\rho_{n,J}(x_n)).
+\end{equation}
+
+Now, we present a \lcnamecref{thm:1dMMRW_cost:EV_Qj} which may be considered the Markov-modulated analogue of \cref{thm:1dRW_cost:EV}.
+
+\begin{lemma}
+	\label{thm:1dMMRW_cost:EV_Qj}
+	The expected value of the total cost accumulated in the $j$th state is given by
+		\begin{equation*}
+	\E{Q_j(x_0)} = \sum_{n=0}^\infty \int_{r_j}^{\lambda-r_j} \rho_{n,j}(x_n) \mathbb{E} \left[q_j(X_{n},X_{n+1}) \mid X_n = x_n, Z_n = j \right]dx_n.
+	\end{equation*}
+	where $\rho_{n,j}(x_n)$ is the probability density function for the forager's location after taking $n$ steps with $Z_n=j$.
+\end{lemma}
+
+\begin{proof}
+	Taking the expectation of \cref{eq:1dMMRW_cost:Q_rearranged} gives
+	\begin{align*}
+	\E{Q_j(x_0)} &= \sum_{n=0}^\infty \mathbb{E}\left[ \indic_{(\tau \geq n+1)} \indic_{(Z_{n} = j)}  q_j(X_{n},X_{n+1}) \right]\\
+	&= \sum_{n=0}^\infty \sum_{k \in \statespace} \int_{-\infty}^{\infty}  \rho_{n,k}(x_n)  \mathbb{E}\left[ \indic_{(\tau \geq n+1)} \indic_{(Z_{n} = j)}\right.\\
+	&\times \left.  q_j(X_{n},X_{n+1}) \mid X_n = x_n, Z_n = k\right]dx_n,
+	\end{align*}
+	where we have conditioned on both the forager's location after $n$ steps, $x_n$, as well as the state of $Z$ after $n$ steps, $Z_n$.
+	Now, realising that the second indicator function implies that the expression is zero unless the forager is in state $j$, and the first indicator function implies that the expression is zero unless the forager is within $(r_j,\lambda-r_j)$ , we get
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:EV_Qj}
+	\E{Q_j(x_0)} = \sum_{n=0}^\infty \int_{r_j}^{\lambda-r_j} \rho_{n,j}(x_n) \mathbb{E} \left[q_j(X_{n},X_{n+1}) \mid X_n = x_n, Z_n = j \right]dx_n,
+	\end{equation*}
+	which completes the proof.
+\end{proof}
+
+We use a new function $h_j(x)$ to denote this expectation term,
+\begin{equation*}
+\label{eq:1dMMRW_cost:h_def}
+h_j(x) = \mathbb{E}\left[q_j(X_n,X_{n+1}) \mid X_n = x, Z_n = j\right],
+\end{equation*}
+and hence
+\begin{equation}
+\label{eq:1dMMRW_cost:EV_Qj_h}
+\E{Q_j(x_0)} = \sum_{n=0}^\infty \int_{r_j}^{\lambda-r_j} \rho_{n,j}(x_n) h_j(x_n)dx_n.
+\end{equation}
+
+As in the original random walk strategy, we must now deal with the density function $\rho_{n,j}(x_n)$, which we do using operators.
+
+\begin{definition}
+	\label{def:1dMMRW_cost:Lij}
+	We define the operator $\L_{i,j}$, for $i,j \in \statespace$, which acts on any real-valued function $f : \R \to \R^+$, as
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:Lij}
+	[\L_{i,j} f] (x_n) = \int_{r_i}^{\lambda-r_i} p_i(x_n-x_{n-1}) f(x_{n-1}) P_{i,j}(x_{n}) dx_{n-1},
+	\end{equation*}
+	recalling that $r_i$ is the forager's radius of vision while $Z$ is in state $i$ and $P$ is the transition matrix of $Z$, and hence $P_{i,j}$ is the $(i,j)$th element of the transition matrix.
+	
+	As with the unmodulated case, we may sometimes wish to treat the situation in which we have the initial condition $X_0=a$, almost surely. Let $\rho_a$ be the measure defining this initial condition and we explicitly define
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:integral_operator_rho}
+	[\L_{i,j} \rho_a] (x_n) = \int_{r_v}^{\lambda-r_v} p_i(x_n-x_{n-1}) \delta(x_{n-1}-a)  P_{i,j}(x_n) dx_{n-1} = P_{i,j}(x_n) p_i(x_n - a).
+	\end{equation*}
+\end{definition}
+
+This operator that we have defined, $\L_{i,j}$, is very similar in structure to the integral operator in \cref{sec:1dRW_cost} (\cref{def:1dRW_cost:integral_operator}).
+The only differences are the different limits of integration and the inclusion of the $P_{i,j}(x_{n})$ term, which accounts for the probability of $Z$ switching states.
+
+\begin{definition}
+	\label{def:1dMMRW_cost:L}
+	We define the operator $\Lmat$, which acts on any positive, real-valued function $f : \R \to ({\R}^+)^{m \times J}$ with $m$ being any positive integer, as
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:L}
+	[\Lmat f] (x_n) = \left[	\begin{pmatrix}
+	f_{1,1} & f_{1,2} & \cdots & f_{1,J} \\
+	f_{2,1} & f_{2,2} & \cdots & f_{2,J} \\
+	\vdots  & \vdots  & \ddots & \vdots  \\
+	f_{m,1} & f_{m,2} & \cdots & f_{m,J}
+	\end{pmatrix} \begin{pmatrix}
+	\L_{1,1} & \L_{1,2} & \cdots & \L_{1,J} \\
+	\L_{2,1} & \L_{2,2} & \cdots & \L_{2,J} \\
+	\vdots  & \vdots  & \ddots & \vdots  \\
+	\L_{J,1} & \L_{J,2} & \cdots & \L_{J,J}
+	\end{pmatrix}\right](x_n),
+	\end{equation*}
+	where $\Lmat$ has dimension $J\times J$ and is applied to $f$ in the same order that matrix multiplication is done.
+	That is, the $(i,j)$th element of $[\Lmat f](x_n)$ is given by $\sum_{k=1}^J [\L_{k,j}f_{i,k}](x_n)$.
+
+	When raised to a power, the innermost operator acts first, and continues in order from the inside to the outside, that is, $[\Lmat^n f](x) = [\Lmat [\Lmat [ \dots [\Lmat f]\dots ]](x)$.
+\end{definition}
+
+The subscript on the $\L_{i,j}$ operators represent $Z$ switching between state $i$ to state~$j$.
+The operator $\Lmat$, being made up entirely of these $\L_{i,j}$ operators, essentially handles the transition matrix for $Z$, as well as the forager's location.
+
+\begin{lemma}
+	\label{thm:1dMMRW_cost:L_recursive}
+	The operator $\Lmat$, as defined in \cref{def:1dMMRW_cost:L}, gives the recursive relation \begin{equation*}
+	\label{eq:1dMMRW_cost:L_recursive}
+	\vec{\rho_{n}}(x_{n}) = [\Lmat \vec{\rho_{n-1}}](x_{n}) \text{ for }x_n \in \mathbb{R} .
+	\end{equation*}
+\end{lemma}
+
+\begin{proof}
+First, we note that the density of the forager's location on the $n$th step, at the end of which $Z$ has transitioned to state $j$ can be expressed by the recursive relation
+	\begin{equation}
+		\label{eq:1dMMRW_cost:rho_single_recursion}
+		\rho_{n,j}(x_n) = \sum_{i=1}^J \int_{r_i}^{\lambda-r_i} p_i(x_n-x_{n-1}) \rho_{n-1,i}(x_{n-1}) P_{i,j}(x_n) dx_{n-1},
+	\end{equation}
+	which has the same justification as it does in the case of the random walk (see \cref{eq:1dRW_cost:rho_recursive}), now with the extra term $P_{i,j}(x_{n})$ representing any transition of $Z$ that may end up in state $j$, which also gives us the sum over $i$.
+
+The careful reader may observe that if $r_i < r_j$, then there is a possibility that the forager steps to a position $r_i < x_n < r_j$ (or $\lambda-r_j < x_n < \lambda-r_i$).
+This implies that $\rho_{n,j}(x_n)$ is non-zero, even though the food patch is within the forager's new radius of vision and hence has already been located, which seems to be an error.
+However, the integration at time $n+1$, according to \cref{eq:1dMMRW_cost:rho_single_recursion}, must be over $(r_j,\lambda-r_j)$, which excludes this value of $x_n$, and hence the forager still locates its food at the end of the $n$th step and terminates its search.
+
+\cref{eq:1dMMRW_cost:rho_single_recursion} can be written with our operator as
+	\begin{equation}
+	\label{eq:1dMMRW_cost:rho_single_Lij}
+	\rho_{n,j}(x_n) = \sum_{i=1}^J [\L_{i,j} \rho_{n-1,i}](x_n),
+	\end{equation}
+	from \cref{def:1dMMRW_cost:Lij}. Recall from \cref{eq:1dMMRW_cost:rho_vector} that
+	\begin{equation*}
+	\vec{\rho_{n-1}}(x_n) = \left( \rho_{n-1,1}(x_n),\dots,\rho_{n-1,J}(x_n) \right).
+	\end{equation*}
+	Applying the operator $\Lmat$ to this vector,
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:L_rho}
+	[\Lmat \vec{\rho_{n-1}}] (x_n) = \left[	\begin{pmatrix}
+	\rho_{n-1,1} & \rho_{n-1,2} & \cdots &\rho_{n-1,J} \\
+	\end{pmatrix} \begin{pmatrix}
+	\L_{1,1} & \L_{1,2} & \cdots & \L_{1,J} \\
+	\L_{2,1} & \L_{2,2} & \cdots & \L_{2,J} \\
+	\vdots  & \vdots  & \ddots & \vdots  \\
+	\L_{J,1} & \L_{J,2} & \cdots & \L_{J,J}
+	\end{pmatrix}\right](x_n),
+	\end{equation*}
+	and multiplying out gives
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:L_rho_expanded}
+	[\Lmat \vec{\rho_{n-1}}](x_n) = \left( \sum_{k=1}^J [\L_{k,1}\rho_{n-1,k}](x_n), \dots , \sum_{k=1}^J [\L_{k,J}\rho_{n-1,k}](x_n) \right).
+	\end{equation*}
+	Finally, applying \cref{eq:1dMMRW_cost:rho_single_Lij} results in
+	\begin{equation*}
+	[\Lmat \vec{\rho_{n-1}}](x_n) = \left( \rho_{n,1}(x_n), \dots, \rho_{n,J}(x_n) \right) = \vec{\rho_{n}}(x_n),
+	\end{equation*}
+	which completes the proof.
+\end{proof}
+\begin{lemma}
+	\label{thm:1dMMRW_cost:operator_rho0}
+	The operator $\Lmat$ gives the expression
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:operator_rho0}
+	\vec{\rho_n}(x) = [\Lmat^n \vec{\rho_0}](x),
+	\end{equation*}
+	for any $n \geq 0$, and $x \in \mathbb{R}$.
+\end{lemma}
+\begin{proof}
+This is by induction, following analogous arguments to the proof of \cref{thm:1dRW_cost:operator_rho0}.
+\end{proof}
+
+We are now able to use these results to simplify \cref{eq:1dMMRW_cost:EV_Qj_h} to
+\begin{equation}
+\label{eq:1dMMRW_cost:EV_rho0}
+\E{Q_j(x_0)} = \sum_{n=0}^\infty \int_{r_j}^{\lambda-r_j} [\Lmat^n \vec{\rho_0}]_j(x_n) h_j(x_n)dx_n .
+\end{equation}
+
+Just as for the random walk strategy, we would like to rewrite the infinite sum of $\Lmat^n$ as $(\Id - \Lmat)^{-1}$ using a Neumann series.
+Thus, we now prove some properties of the operator $\Lmat$. In particular, we show that the operator norm of $\Lmat$ is less than $1$. Recall that for the unmodulated random walk we proved that $\normop{\L}<1$ with \cref{thm:1dRW_cost:Q_operator_norm_lmax,thm:1dRW_cost:Q_operator_norm_Lk,thm:1dRW_cost:Q_operator_norm_recursive,thm:1dRW_cost:Q_operator_norm}. Rather than prove the Markov-modulated case across multiple theorems again, we can instead rely on some of the results of the unmodulated case to simplify the proof. 
+
+\begin{definition}
+	\label{def:1dMMRW_cost:norm}
+	We define for a function $f : \mathbb{R} \to (\mathbb{R}^{+})^{ m \times J}$, a norm $\norm{\cdot}$ given by
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:norm}
+	\norm{f} = \max_{i=1,\dots,m} \sum_{j=1}^J \int_0^\lambda \left| f_{i,j}(x) \right| dx.
+	\end{equation*}
+\end{definition}
+This is essentially the maximum column sum of the matrix, where we are also taking the $L^1$-norm for each element, since $f$ is a matrix-valued function. The $L^1$-norm for functions was discussed in \cref{thm:1dRW_cost:Q_operator_norm_alternate} following \cref{thm:1dRW_cost:Q_operator_norm_lmax}, so we will be able to rely on some previous results. 
+
+\begin{lemma}
+	\label{thm:1dMMRW_cost:operator_norm}
+	$\normop{\Lmat} < 1$, where $\normop{\cdot}$ is the operator norm given by
+	\begin{equation*}
+	\normop{\Lmat} = \sup \left\{ \frac{\norm{\Lmat f}}{\norm{f}}:  \norm{f} \neq 0 \right\},
+	\end{equation*}
+	with $\norm{\cdot}$ taken from \cref{def:1dMMRW_cost:norm}.
+\end{lemma}
+
+\begin{proof}
+	For some matrix function $f$, we have
+	\begin{equation*}
+	\norm{f} = \max_{i=1,\dots,m} \sum_{k=1}^J \int_0^\lambda \left| f_{i,k}(x) \right| dx =: C.
+	\end{equation*}
+	
+	Consider
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:Lf}
+	[\Lmat f](x) = \begin{pmatrix}
+	\sum\limits_{k=1}^J [\L_{k,1}f_{1,k}](x) & \sum\limits_{k=1}^J [\L_{k,2}f_{1,k}](x) & \cdots & \sum\limits_{k=1}^J [\L_{k,J}f_{1,k}](x) \\
+	\sum\limits_{k=1}^J [\L_{k,1}f_{2,k}](x) & \sum\limits_{k=1}^J [\L_{k,2}f_{2,k}](x) & \cdots & \sum\limits_{k=1}^J [\L_{k,J}f_{2,k}](x) \\
+	\vdots  & \vdots  & \ddots & \vdots  \\
+	\sum\limits_{k=1}^J [\L_{k,1}f_{m,k}](x) & \sum\limits_{k=1}^J [\L_{k,2}f_{m,k}](x) & \cdots & \sum\limits_{k=1}^J [\L_{k,J}f_{m,J}](x)
+	\end{pmatrix},
+	\end{equation*}
+	which we now take the norm of to give
+	\begin{align*}
+	\norm{\Lmat f} &=  \max_{i=1,\dots,m}  \sum_{j=1}^J \int_0^\lambda \left| \left[ [\Lmat f](x)\right]_{i,j} \right|dx\\
+	&=  \max_{i=1,\dots,m}  \sum_{j=1}^J \int_0^\lambda \left| \sum_{k=1}^J [\L_{k,j}f_{i,k}](x) \right|dx\\
+	&=\max_{i=1,\dots,m}  \sum_{j=1}^J \int_0^\lambda \left| \sum_{k=1}^J \int_{r_k}^{\lambda-r_k} p_k(x-x') f_{i,k}(x')P_{k,j}(x)dx'  \right|dx\\
+	&= \max_{i=1,\dots,m}  \sum_{j=1}^J  \sum_{k=1}^J \int_0^\lambda \int_{r_k}^{\lambda-r_k} p_k(x-x')  f_{i,k}(x')  P_{k,j}(x)dx' dx\\
+	&\leq \max_{i=1,\dots,m}  \sum_{j=1}^J  \sum_{k=1}^J \int_0^\lambda \int_{0}^{\lambda} p_k(x-x')  f_{i,k}(x')  P_{k,j}(x)dx' dx,
+	\end{align*}
+	where the final line follows from the fact that everything inside the integrals is positive.
+	Rearranging this further gives
+	\begin{align}
+	\norm{\Lmat f} &\leq \max_{i=1,\dots,m}  \sum_{j=1}^J  \sum_{k=1}^J \int_0^\lambda P_{k,j}(x) \int_{0}^{\lambda} p_k(x-x')   f_{i,k}(x')  dx' dx \nonumber\\
+	&= \max_{i=1,\dots,m}   \sum_{k=1}^J \int_0^\lambda \int_{0}^{\lambda} p_k(x-x')  f_{i,k}(x') dx' dx =: C^*. \label{eq:1dRMMRW_cost:Q_operator_norm_inequality}
+	\end{align}
+	Recall the unmodulated operator $\L$ from \cref{def:1dRW_cost:integral_operator}, which applied to a function $f_{i,k}$ gives
+	\begin{equation*}
+	[\L f_{i,k}](x) = \int_{r_v}^{\lambda-r_v} p(x-x')  f_{i,k}(x') dx',
+	\end{equation*}
+	where $p(x)$ is some step-length distribution, and $r_v$ is any non-negative constant with $r_v \leq \lambda$.
+	From \cref{thm:1dRW_cost:Q_operator_norm} and \cref{thm:1dRW_cost:Q_operator_norm_alternate} we know that $\norm{\L f_{i,k}}_1 < \norm{f_{i,k}}_1$ for any $i=1,\dots,m$ and $k=1,\dots,J$, which means
+	\begin{equation*}
+	\int_{r_v}^{\lambda-r_v} \int_{r_v}^{\lambda-r_v} p(x-x') f_{i,k}(x')  dx' dx < \int_{r_v}^{\lambda-r_v}  f_{i,k}(x) dx.
+	\end{equation*}
+	This inequality is still true for $r_v=0$ and for any choice of step-length distribution, so we can substitute this into \cref{eq:1dRMMRW_cost:Q_operator_norm_inequality} to get
+	\begin{equation*}
+	\max_{i=1,\dots,m}   \sum_{k=1}^J \int_0^\lambda \int_{0}^{\lambda} p_k(x-x')   f_{i,k}(x')  dx' dx  < \max_{i=1,\dots,m} \sum_{k=1}^J \int_{r_v}^{\lambda-r_v}  f_{i,k}(x)  dx,
+	\end{equation*}
+	which implies $C^* < C$.
+	Thus, we get that
+	\begin{equation*}
+	\frac{\norm{\Lmat f}_1}{\norm{f}_1} \leq \frac{C^*}{C} < 1 \implies \normop{\Lmat}<1,
+	\end{equation*}
+which completes the proof.
+
+\end{proof}
+
+\begin{theorem}
+	\label{thm:1dMMRW_cost:Qj_neumann}
+	\Cref{eq:1dMMRW_cost:EV_rho0} is a convergent Neumann series, and so the expectation of the total cost accumulated in state $j$ can be expressed as
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:Qj_neumann}
+	\E{Q_j(x_0)} = \int_{r_j}^{\lambda-r_j} [(\Id - \Lmat)^{-1} \vec{\rho_0}]_j(x_n) h_j(x_n)dx_n .
+	\end{equation*}
+\end{theorem}
+
+\begin{proof}
+	From \cref{thm:1dMMRW_cost:operator_norm}, we know that the operator norm of $\Lmat$ is strictly less than unity. Therefore, by \cref{thm:neumannseries},
+	\begin{equation}
+	\label{eq:1dMMRW_cost:L_neumann}
+	\left[(\Id - \Lmat)^{-1} f \right] = \sum_{n=0}^\infty \left[ \Lmat^n f \right],
+	\end{equation}
+	for any function $f$, where $\Id$ is the identity operator. Recall \cref{eq:1dMMRW_cost:EV_rho0} was given by
+	\begin{equation*}
+	\E{Q_j(x_0)} = \sum_{n=0}^\infty \int_{r_j}^{\lambda-r_j} [\Lmat^n \vec{\rho_0}]_j(x_n) h_j(x_n)dx_n.
+	\end{equation*}
+	The order of the integral and summation may be changed according to \cref{thm:switchsummationintegral} since both $[\Lmat^n \vec{\rho_0}]_j(x_n)$ and $h_j(x_n)$ are non-negative and measurable. Therefore, \cref{eq:1dMMRW_cost:L_neumann} implies that
+	\begin{equation*}
+	\E{Q_j(x_0)} = \int_{r_j}^{\lambda-r_j} [(\Id - \Lmat)^{-1} \vec{\rho_0}]_j(x_n) h_j(x_n)dx_n .
+	\end{equation*}
+\end{proof}
+
+Just as we did for \cref{eq:1dRW_cost:EV2_neumann}, we note that \cref{eq:1dMMRW_cost:EV_rho0} may be used to numerically solve for $\E{Q_j(x_0)}$ after the discretisation of the search space.
+This expression allows us to solve for any initial location of the forager, $\vec{\rho_0}(x_0)$, which is demonstrated in \cref{sec:1d_discrete}.
+However, recall from the analysis of the unmodulated strategy that we were able to obtain a much simpler analytic expression involving only $\Lmat$ and $h$, using properties of the Dirac delta function, among other things.
+We proceed in a similar manner, in order to explain why an expression as simple as this does not quite work for the cost across a single state, rather works only for the cost over all states.
+
+Recall the assumption that the initial location of a forager is known to be $x_0 = a$, but we do not assume anything about the initial state of $Z$.
+That is,
+\begin{equation*}
+\label{eq:1dMMRW_cost:dirac}
+\vec{\rho_0}(x_0) = \delta(x_0-a) \vec{z_{0}},
+\end{equation*}
+where $\vec{z_0} = \left( \Pr(Z_0 = 1), \dots, \Pr(Z_0 = J) \right)$.
+This also means that
+\begin{equation*}
+\rho_{0,k}(x_0) = \delta(x_0 - a)\Pr(Z_0 = k).
+\end{equation*}
+
+In the unmodulated case, the Dirac delta was applied in the proof of \cref{thm:1dRW_cost:EV_dirac}.
+The essential part of the proof was applying the operator $\L$ to $h$ in reverse.
+That is, the outermost application of $\L$ to the density $\rho$ became the innermost application to the function $h$, and vice versa.
+This reversal is somewhat obfuscated in the unmodulated case since all $\L$ are equivalent.
+However, in the Markov-modulated strategy, each operator $\L_{i,j}$ corresponds to having a radius of vision $r_i$, and hence limits of integration, that depends on $i$.
+Thus, the order of application of these operators does matter.
+To deal with this issue, we define a new operator, which is a slightly modified version of the operator $\L_{i,j}$ from \cref{def:1dMMRW_cost:Lij}.
+
+\begin{definition}
+	\label{def:1dMMRW_cost:Lij_alt}
+	We define the operator $\Lalt_{i,j}$, for $i,j \in \statespace$, which acts on any positive, real-valued function $f : \R \to \R^+$, as
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:Lij_alt}
+	[\Lalt_{i,j} f] (x_n) = \int_{r_j}^{\lambda-r_j} p_i(x_n-x_{n-1})f(x_{n-1}) P_{i,j}(x_{n}) dx_{n-1},
+	\end{equation*}
+	recalling that $r_j$ is the forager's radius of vision while $Z$ is in state $j$ and $P$ is the transition matrix of $Z$, and hence $P_{i,j}$ is the $(i,j)$th element of the transition matrix.
+\end{definition}
+The key difference between $\L_{i,j}$ from \cref{def:1dMMRW_cost:Lij} and the modified operator in \cref{def:1dMMRW_cost:Lij_alt} is that the integration is now performed over the interval associated with $j$ instead of $i$.
+Clearly, if the radius of vision is the same in both states, $r_i = r_j$, we get that $\L_{i,j}$ is equivalent to $\Lalt_{i,j}$.
+
+We then also define a new operator, $\Laltmat$, which is simply the matrix operator $\Lmat$, but with all entries $\L_{i,j}$ replaced with $\L^*_{i,j}$.
+\begin{definition}
+	\label{def:1dMMRW_cost:L_alt}
+	We define the operator $\Laltmat$, which acts on any positive, real-valued function $f : \R \to {\R}_+^{m \times J}$ with $m$ being any positive integer, as
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:_L_alt}
+	[\Laltmat f] (x_n) = \left[	\begin{pmatrix}
+	f_{1,1} & f_{1,2} & \cdots & f_{1,J} \\
+	f_{2,1} & f_{2,2} & \cdots & f_{2,J} \\
+	\vdots  & \vdots  & \ddots & \vdots  \\
+	f_{m,1} & f_{m,2} & \cdots & f_{m,J}
+	\end{pmatrix} \begin{pmatrix}
+	\Lalt_{1,1} & \Lalt_{1,2} & \cdots & \Lalt_{1,J} \\
+	\Lalt_{2,1} & \Lalt_{2,2} & \cdots & \Lalt_{2,J} \\
+	\vdots  & \vdots  & \ddots & \vdots  \\
+	\Lalt_{J,1} & \Lalt_{J,2} & \cdots & \Lalt_{J,J}
+	\end{pmatrix}\right](x_n),
+	\end{equation*}
+	where $\Laltmat$ has dimension $J\times J$ and is applied to $f$ in the same order that matrix multiplication is done.
+\end{definition}
+
+In the special case of the radius of vision being constant across all states, we get that $\Lmat$ is equivalent to $\Laltmat$.
+Using these new definitions, we now present a \lcnamecref{thm:1dMMRW_cost:EV_Qj_sum}, which follows roughly the same procedure as the first part of the proof for \cref{thm:1dRW_cost:EV_dirac}.
+\begin{lemma}
+	\label{thm:1dMMRW_cost:EV_Qj_sum}
+	If the transition matrix $P$ is independent of the forager's location, then the expected total cost accumulated in state $j$ of a Markov-modulated random walk starting at $x_0 = a$ can also be given by
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:EV_Qj_sum}
+	\E{Q_j(x_0)} = 	\sum_{n=0}^\infty \sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J z_{0,k_0} \left[ \Lalt_{k_{0},k_{1}} \dots \left[ \Lalt_{k_{n-1},j} h_{j} \right] \dots \right]   (a),
+	\end{equation*}
+	where $k_i$ represents the state of $Z$ after taking $i$ steps.
+\end{lemma}
+\begin{proof}
+We begin with
+\begin{equation}
+\label{eq:1dMMRW_cost:EV_Qj_LHS}
+\E{Q_j(x_0)} = \sum_{n=0}^\infty\int_{x_n=r_j}^{\lambda-r_j} \left[ \Lmat^n \vec{\rho_0}\right]_j (x_n) h_j(x_n)dx_n.
+\end{equation}
+We may use the definition of our operator $\Lmat$ to rewrite $\left[ \Lmat^n \vec{\rho_0}\right]_j (x_n) $ as
+\begin{equation*}
+\sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J \left[ \L_{k_{n-1},j} \left[ \L_{k_{n-2},k_{n-1}} \dots \left[ \L_{k_0,k_1} \rho_{0,k_0} \right] \dots \right] \right] (a),
+\end{equation*}
+and thus \cref{eq:1dMMRW_cost:EV_Qj_LHS} becomes
+\begin{equation*}
+\begin{split}
+\E{Q_j(x_0)} &= 	\sum_{n=0}^\infty \int_{x_n=r_j}^{\lambda-r_j} h_j (x_n)\\
+&\times \left[ \sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J \left[ \L_{k_{n-1},j} \left[ \L_{k_{n-2},k_{n-1}} \dots \left[ \L_{k_0,k_1} \rho_{0,k_0} \right] \dots \right] \right]  (x_n) \right] dx_n.
+\end{split}
+\end{equation*}
+We can expand out the integral using the definition of $\L_{i,j}$,
+\begin{equation*}
+\begin{split}
+\E{Q_j(x_0)} = \sum_{n=0}^\infty\int_{x_n=r_j}^{\lambda-r_j} &\sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J  \int_{x_{n-1}=r_{k_{n-1}}}^{\lambda-r_{k_{n-1}}}  \dots \int_{x_0=r_{k_{0}}}^{\lambda-r_{k_{0}}} \prod_{i=0}^{n-1} \left[ p_{k_i}(x_{i+1}-x_i)\right.\\
+&\left.\times \rho_{0,k_0}(x_0)P_{k_i,k_{i+1}}(x_{i+1}) dx_i\right] h_j(x_n)dx_n.
+\end{split}
+\end{equation*}
+We rearrange the order of the sums and integrals to get,
+\begin{equation*}
+\begin{split}
+\E{Q_j(x_0)} = 	\sum_{n=0}^\infty \sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J \int_{x_0=r_{k_{0}}}^{\lambda-r_{k_{0}}}   &\rho_{0,k_0}(x_0) \int_{x_{1}=r_{k_{1}}}^{\lambda-r_{k_{1}}} \dots \int_{x_n=r_j}^{\lambda-r_j}\prod_{i=0}^{n-1} \left[ p_{k_i}(x_{i}-x_{i+1}) \right.\\
+&\left. \times P_{k_i,k_{i+1}}(x_{i+1})\right] h_j(x_n)dx_n dx_{n-1}\dots dx_1 dx_0
+\end{split}
+\end{equation*}
+where we have switched $p_{k_i}(x_{i+1} - x_i)$ for $p_{k_i}(x_{i} - x_{i+1})$, due to symmetry.
+It is at this point we require $P_{k_i,k_{i+1}}(x_{i}) = P_{k_i,k_{i+1}}(x_{i+1})$ for all $x_{i}, x_{i+1} \in [0, \lambda]$ if we wish to simplify our expression any further.
+Thus, we use the assumption that the transition matrix $P$ is independent of the forager's location.
+
+Using the operator from \cref{def:1dMMRW_cost:Lij_alt}, we may rewrite the innermost integral of our expression, to get
+\begin{equation*}
+\begin{split}
+\E{Q_j(x_0)} = 	\sum_{n=0}^\infty \sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J \int_{x_0=r_{k_{0}}}^{\lambda-r_{k_{0}}}   &\rho_{0,k_0}(x_0) \int_{x_1=r_{k_{1}}}^{\lambda-r_{k_{1}}} \dots \int_{x_{n-1}=r_{k_{n-1}}}^{\lambda-r_{k_{n-1}}}\\
+&\prod_{i=0}^{n-2} p_{k_i}(x_{i}-x_{i+1})P_{k_i,k_{i+1}} [\L^*_{k_{n-1},j} h_j](x_{n-1}) dx_i .
+\end{split}
+\end{equation*}
+In this same fashion, we may rewrite the innermost $n-2$ integrals, giving
+\begin{equation*}
+\E{Q_j(x_0)} = 	\sum_{n=0}^\infty \sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J \int_{x_0=r_{k_{0}}}^{\lambda-r_{k_{0}}}   \rho_{0,k_0}(x_0) \left[ \L^*_{k_{0},k_{1}} \dots \left[ \L^*_{k_{n-1},j} h_{j} \right] \dots \right]   (x_0) dx_0.
+\end{equation*}
+Recall that the initial condition for $\vec{\rho_0}$ implies that $\rho_{0,k_0}(x_0) = \delta(x_0-a)z_{0,k_0}$, and so we can integrate over the Dirac delta function, to get
+\begin{equation}
+\label{eq:1dMMRW_cost:Qj_sum_delta}
+\E{Q_j(x_0)} = \sum_{n=0}^\infty \sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J z_{0,k_0} \left[ \Lalt_{k_{0},k_{1}} \dots \left[ \Lalt_{k_{n-1},j} h_{j} \right] \dots \right]   (a).
+\end{equation}
+\end{proof}
+
+In analogue to the non-Markov-modulated strategy, we would like to write our expression only in terms of $\Laltmat$, $\vec{h}$, and $\vec{z_0}$, evaluated at the initial location $a$, where $\vec{h}(x)$ is the row vector with $i$th element $h_i(x)$.
+Consider $\vec{h}^\top(x) \vec{z_0}$, which is a $J \times J$ matrix, with $(i,j)$th element $h_i(a) z_{0,j}$, and applying the operator $\Laltmat$ to this matrix gives the matrix $\left[ \Lalt(\vec{h}^\top \vec{z_0})\right](x)$, with $(i,j)$th element $\sum_{k=1}^J [\Lmat^*_{k,j} h_i z_{0,k}](a)$.
+Repeatedly applying the operator $\Laltmat$ gives,
+\begin{multline*}
+\sum_{n=0}^\infty \left[ {\Laltmat}^n \left( \vec{h}^\top \vec{z_0} \right) \right]_{jj} (a)\\ = \sum_{n=0}^\infty \sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J \left[ \L^*_{k_{n-1},j} \left[ \L^*_{k_{n-2},k_{n-1}} \dots \left[ \L^*_{k_0,k_1} (z_{0,k_0} h_j) \right] \dots \right] \right] (a),
+\end{multline*}
+where the inner most operator is being applied to the function $z_{0,k_0} h_j(x)$.
+Since $z_{0,k_0}$ is a constant it may be pulled out the front of all the operators due to their linearity,
+\begin{multline}
+\label{eq:1dMMRW_cost:Ln_hz}
+\sum_{n=0}^\infty \left[ {\Laltmat}^n \left( \vec{h}^\top \vec{z_0} \right) \right]_{jj} (a) \\= \sum_{n=0}^\infty \sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J  z_{0,k_0} \left[ \L^*_{k_{n-1},j} \left[ \L^*_{k_{n-2},k_{n-1}} \dots \left[ \L^*_{k_0,k_1}  h_j \right] \dots \right] \right] (a).
+\end{multline}
+
+We can see from \cref{eq:1dMMRW_cost:Ln_hz} that applying ${\Laltmat}^n$ to the matrix $\vec{h}^\top(x) \vec{z_0}$ produces the correct indexing for $z_{0,k_0} h_j$.
+However, the indexing for the $\Lalt_{i,j}$ operators do not match that of \cref{eq:1dMMRW_cost:Qj_sum_delta}.
+Since all of the $k_i$ terms are essentially dummy variables, the only index that matters in both \cref{eq:1dMMRW_cost:Qj_sum_delta} and \cref{eq:1dMMRW_cost:Ln_hz} is the operator involving $j$.
+These are not in the same position, and so these expressions are not necessarily equivalent.
+
+In fact, due to the way that the operators $\Lmat$ and $\Laltmat$ are applied, there is no such expression involving $\Laltmat^n$ or ${\Lmat}^n$ and $\vec{h}$ that will be equivalent to \cref{eq:1dMMRW_cost:Qj_sum_delta}.
+
+If we instead consider the expectation of the total cost across all states, we no longer face this issue.
+
+\begin{theorem}
+\label{thm:1dMMRW_cost:Q_Ln_hz}
+The expected total cost accumulated by a Markov-modulated random walk starting at $x_0 = a$, with transition matrix $P$ independent to the forager's location is
+\begin{equation}
+\label{eq:1dMMRW_cost:Q_Ln_hz}
+\E{Q(a)} = \Tr{\sum_{n=0}^\infty \left[{\Laltmat}^n \left( \vec{h}^\top \vec{z_0} \right) \right](a) }.
+\end{equation}
+\end{theorem}
+\begin{proof}
+	Beginning with the left hand side of \cref{eq:1dMMRW_cost:Q_Ln_hz}, we note that
+	\begin{equation*}
+	\E{Q(a)} = \sum_{j=1}^J \E{Q_j(a)}
+	\end{equation*}
+	and so,
+	\begin{equation*}
+	\E{Q(a)} = \sum_{n=0}^\infty	\sum_{j=1}^J \sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J z_{0,k_0} \left[ \Lalt_{k_{0},k_{1}} \dots \left[ \Lalt_{k_{n-1},j} h_{j} \right] \dots \right]   (a),
+	\end{equation*}
+	by \cref{thm:1dMMRW_cost:EV_Qj_sum}. Now, considering the right hand side
+	\begin{align*}
+	 &\text{Tr}\left( \sum_{n=0}^\infty  \left[{\Laltmat}^n \left( \vec{h}^\top \vec{z_0} \right) \right](a) \right) = \sum_{j=1}^J \left[ \sum_{n=0}^\infty \left[{\Laltmat}^n \left( \vec{h}^\top \vec{z_0} \right) \right](a) \right]_{jj}\\
+ &=\sum_{n=0}^\infty \sum_{j=1}^J \sum_{k_0=1}^J \dots \sum_{k_{n-1}=1}^J  z_{0,k_0} \left[ \Lalt_{k_{n-1},j} \left[ \Lalt_{k_{n-2},k_{n-1}} \dots \left[ \Lalt_{k_0,k_1}  h_j \right] \dots \right] \right] (a),
+\end{align*}
+by \cref{eq:1dMMRW_cost:Ln_hz}.
+
+	The expressions for the left-hand and right-hand side differ only by the indexing of the operators.
+	Since the indices in both expressions are being summed over from $1$ to $J$, they are all dummy variables, meaning the two expressions are equivalent.
+\end{proof}
+
+\begin{theorem}
+	\label{thm:1dMMRW_cost:Q_neumann}
+	\Cref{eq:1dMMRW_cost:Q_Ln_hz} is a convergent Neumann series, and so the expectation of the total cost can be expressed as
+	\begin{equation*}
+	\label{eq:1dMMRW_cost:Q_neumann}
+	\E{Q(a)} = \Tr{\left[ (\Id - {\Laltmat})^{-1} \left( \vec{h}^\top \vec{z_0} \right) \right](a) } .
+	\end{equation*}
+\end{theorem}
+\begin{proof}
+	This follows analogous arguments to those of the proof of \cref{thm:1dMMRW_cost:Qj_neumann}.
+\end{proof}
+\begin{corollary}
+The expectation of the total cost, for a Markov-modulated random walk with a constant radius of vision can be written as
+\begin{equation*}
+\label{eq:1dMMRW_cost:Q_neumann_nostar}
+\E{Q(a)} = \Tr{\left[ (\Id - {\Lmat})^{-1} \left( \vec{h}^\top \vec{z_0} \right) \right](a) }.
+\end{equation*}
+\end{corollary}
+\begin{proof}
+When the radius of vision is constant across all states, $\L_{i,j}^*$ is equivalent to $\L_{i,j}$ for all $i,j \in \statespace$ and so $\Lmat^*$ is equivalent to  $\Lmat$. This is substituted directly into \cref{eq:1dMMRW_cost:Q_Ln_hz}.
+\end{proof}
+
+In conclusion, for a Markov-modulated random walk, with the switching of both the step-length distribution and radius of vision, we have obtained an expression for the expectation of the total cost across a single state, \cref{eq:1dMMRW_cost:Qj_neumann}. With $P$ independent of the forager's location, we have also obtained an expression for the expectation of the total cost across all states, given a known starting location $x_0=a$.
+Both of these expressions avoid the need for infinite summations through the use of convergent Neumann series.
+
+\end{subsection}
+\begin{subsection}{Average total distance travelled \label{sec:1dMMRW_distance}}
+
+As we did for the random walk strategy, we can now use our results for a generic cost function to determine the average total distance travelled for a Markov-modulated random walk strategy.
+We first look at determining the average total distance travelled over a single state.
+
+Our untruncated cost function is defined as
+\begin{equation*}
+\label{eq:1dMMRW_dist:q}
+q^*_j(X_n,X_{n+1}) := \abs{X_{n+1} - X_n}
+\end{equation*}
+where $X_n$ is the position of the forager after taking $n$ steps.
+Then, the truncated cost is given by
+\begin{equation*}
+q_j(X_n,X_{n+1}) = \begin{cases}
+\abs{r_j - X_n} \quad &\text{if }X_{n+1} < r_j,\\
+\abs{X_{n+1} - X_n}  \quad &\text{if } r_j \leq X_{n+1} \leq \lambda-r_j,\\
+\abs{\lambda-r_j -X_n}\quad &\text{if }X_{n+1} > \lambda - r_j.
+\end{cases}
+\end{equation*}
+
+Recall, our function $h_j(x)$ was used to denote the expectation term,
+\begin{equation*}
+h_j(x) = \mathbb{E}\left[q_j(X_0,X_{1}) \mid X_0 = x, Z_0 = j\right],
+\end{equation*}
+and hence, each element of $\vec{h}(x_0)$ can be solved by
+\begin{multline}
+\label{eq:1dMMRW_dist:l_integralsv2}
+h_j(x_0) = \mathbb{E} \left[q_j(X_0,X_1)\mid X_0 = x_0, Z_0 =j \right]\\
+  = \int_{r_j}^{a-\lmin} (a-x)p_j(x-a)dx + \int_{a+\lmin}^{\lambda-r_j} (x-a) p_j(x-a) dx\\
++ (a-r_j) \int_{-\infty}^{r_j} p_j(x-a)dx + (\lambda-r_j-a)\int_{\lambda-r_j}^{\infty} p_j(x-a)dx,
+\end{multline}
+valid for $r_j + \lmin \leq a \leq \lambda - r_j - \lmin$.
+\cref{eq:1dMMRW_dist:l_integralsv2} matches \cref{eq:1dRW_dist:l_integralsv2} for the unmodulated case, with the difference being the radius of vision, $r_j$, and the step-length distribution now depending on $j$.
+
+For any initial distribution, $\vec{\rho_0}$, using \cref{eq:1dMMRW_cost:Qj_neumann}, the average total distance travelled in state $j$ is
+\begin{equation}
+\label{eq:1dMMRW_distance:single_state}
+\E{L_j(x_0)} = \int_{r_j}^{\lambda-r_j} [(\Id - \Lmat)^{-1} \vec{\rho_0}]_j(x_n) h_j(x_n)dx_n .
+\end{equation}
+where $h_j$ is determined by \cref{eq:1dMMRW_dist:l_integralsv2}.
+
+When looking at the distance over a single state, we do not include the extra constant term $r_v$, since we do not attribute the final distance after detecting the food patch to any of the states.
+
+If instead we are concerned with the total cost across all states, we can either sum \cref{eq:1dMMRW_distance:single_state} across all states, or use \cref{eq:1dMMRW_cost:Q_neumann}, to give
+\begin{equation*}
+\E{L(a)} = \Tr{\left[ (\Id - {\Laltmat})^{-1} \left( \vec{h}^\top \vec{z_0} \right) \right](a) } ,
+\end{equation*}
+where $h_j$ is once again determined by \cref{eq:1dMMRW_dist:l_integralsv2}.
+However, we may want to include the distance that is travelled to the food patch after locating it.
+This will depend on what state the animal is in when it locates the food, since the radius of vision is not constant.
+Thus, we get
+\begin{equation*}
+\E{L(x_0)} = \sum_{j=1}^J \left( \int_{r_j}^{\lambda-r_j} [(\Id - \Lmat)^{-1} \vec{\rho_0}]_j(x_n) \left[ h_j(x_n) \right] dx_n + P_{j} r_j \right),
+\end{equation*}
+where $P_{j}$ is the probability that a target is detected during a step that has step-length distribution governed by state $j$. 
+There is no obvious way to solve for this probability that is simple and does not require further use of the operator $\Lmat$. Since the term makes such a small difference to the overall results, we do not solve $P_j$ explicitly.
+\iffalse
+This probability can be expressed as
+\begin{equation*}
+P_j = \sum_{n=0}^\infty \int_{r_j}^{\lambda-r_j} \rho_{n,j}(x) - \sum_{k=1}^J  \rho_{n+1,k}(x) dx,
+\end{equation*}
+which represents the total probability of a forager being inside the search interval while in state $j$, and being outside the search interval on the following step in any other state. We rewrite this as
+\begin{equation*}
+P_j = \sum_{n=0}^\infty \int_{r_j}^{\lambda-r_j} [\L^n \vec{\rho_0}]_j(x) - [\L^{n+1}\vec{\rho_0}](x) \vec{1} dx,
+\end{equation*}
+\fi
+
+As with the random walk, the final result for the average total step length, either across a single state or across all states, cannot be solved analytically for any realistic choice of step-length distribution.
+Therefore, we discuss how it can be solved numerically in \cref{sec:1d_discrete}.
+
+\subsection{Average number of steps\label{sec:1dMMRW_steps}}
+When considering the average number of steps taken by a Markov-modulated random walk, there is no possibility of truncation and so the cost function across a single state $j$ is defined as
+\begin{equation*}
+\label{eq:1dRW_steps:qj}
+q_j(X_i,X_{i+1}) := \begin{cases}
+1 \quad &\text{if } Z_i = j \text{ and }X_i \neq X_{i+1}\\
+0 \quad &\text{if } Z_i \neq j \text{ or } X_i=X_{i+1},
+\end{cases}
+\end{equation*}
+since when $X_i = X_{i+1}$ a target has been found and no further cost is accumulated.
+Then, the $j$th element of the vector $\vec{h}(x)$ will be
+\begin{equation*}
+h_j(x) = \mathbb{E}\left[q_j(X_0,X_{1}) \mid X_0 = x, Z_0 = j\right] = 1.
+\end{equation*}
+
+For the average number of steps in a state $j$, we get
+\begin{equation*}
+\E{\tau_j(x_0)} = \int_{r_v}^{\lambda-r_v} [(\Id - \Lmat)^{-1} \vec{\rho_0}]_j(x_n)dx_n .
+\end{equation*}
+For the average number of steps in total, we get
+\begin{equation*}
+\E{\tau(a)} = \sum_{j=1}^J \E{N_j(a)},
+\end{equation*}
+or using \cref{eq:1dMMRW_cost:Q_neumann},
+\begin{equation*}
+\E{\tau(a)} = \Tr{\left[ (\Id - \Laltmat)^{-1} \left( \vec{1}^\top \vec{z_0} \right) \right](a) }.
+\end{equation*}
+
+As with the average total distance travelled, this expression cannot be solved analytically so we discuss solving this numerically in \cref{sec:1d_discrete}.
+\end{subsection}
+\end{section}

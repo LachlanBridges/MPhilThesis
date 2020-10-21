@@ -1,0 +1,104 @@
+\documentclass[a4paper,12pt]{book}
+\title{In the mood for food: Markov-modulated models for animal foraging}
+\author{Lachlan Bridges}
+\date{January 2019}
+\def\degree{Master of Philosophy}
+\def\discipline{Applied Mathematics}
+
+% Any packages should go here
+
+\newlength\longest
+\usepackage{mymacros}
+\usepackage{thesis}
+
+\usepackage[twoside,bindingoffset=6mm,left=30mm,right=30mm,top=30mm,bottom=30mm,headheight=15pt]{geometry}
+\linespread{1.2}
+
+% What style to use and what file to use for the bibliography
+\usepackage[backend=biber,bibstyle=nature,citestyle=numeric-comp,maxbibnames=99,doi=false,url=false,giveninits=true,hyperref]{biblatex}
+\DeclareNameAlias{sortname}{family-given}
+\DeclareNameAlias{default}{given-family}
+\addbibresource{bibliography/thesis.bib}
+
+\begin{document}
+\frontmatter
+
+\pagestyle{empty}
+\maketitle
+\include{front/statement}
+\include{front/abstract}
+\include{front/acknowledgements}
+\tableofcontents
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+%\listoftables
+
+
+%%%%%% DEDICATION %%%%%%
+\newpage
+\vspace*{8cm}
+{\begin{center}\begin{huge}  \emph{Dedicated to Fern.} \end{huge} \end{center}}
+\vfill
+\epigraph{A loving heart is the beginning of all knowledge.}{Thomas Carlyle}
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+\mainmatter
+\pagestyle{fancy}
+
+
+% Chapter 1: Introduction
+\begin{chapter}{Introduction \label{sec:introduction}}
+\input{chapter-introduction/introduction}
+\end{chapter}
+
+% Chapter 2: Background
+\begin{chapter}{Background \label{sec:background}}
+\input{chapter-background/preliminaries}
+%\input{chapter-background/technicalterms}
+\input{chapter-background/litreview}
+\end{chapter}
+
+
+% Chapter 3: One-dimensional models
+\begin{chapter}{One-dimensional foraging model\label{sec:1Dmodel}}
+\input{chapter-1Dmodel/introduction}
+\input{chapter-1Dmodel/random_walk}
+\input{chapter-1Dmodel/MM_random_walk}
+\input{chapter-1Dmodel/assumptions}
+\end{chapter}
+
+
+% Chapter 4: Discretization
+\begin{chapter}{Discretisation of the one-dimensional search space\label{sec:1d_discrete}}
+\input{chapter-discrete/random_walk}
+\input{chapter-discrete/MM_random_walk}
+\end{chapter}
+
+
+% Chapter 5: Results
+\begin{chapter}{Results for the one-dimensional model \label{sec:1d_results}}
+\input{chapter-results/results}
+\end{chapter}
+
+% Chapter 6: Two-dimensional models
+\begin{chapter}{Two-dimensional Foraging Models\label{sec:2dmodel}}
+\input{chapter-2Dmodel/chapter}
+\end{chapter}
+
+% Chapter 7: Conclusion
+\begin{chapter}{Conclusion \label{sec:conclusion}}
+\input{chapter-introduction/conclusion}
+\end{chapter}
+
+\appendix
+
+% Import the appendices
+\include{appendix/steplengthexpressions}
+\include{appendix/firstorderarea}
+\backmatter
+% Add the bibliography to the table of contents
+\addcontentsline{toc}{chapter}{Bibliography}
+
+\printbibliography
+
+\end{document}

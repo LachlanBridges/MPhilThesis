@@ -1,0 +1,506 @@
+%!TEX root = ../thesis.tex
+\chapter{Calculating $h(x)$ and $A$ for some step-length distributions\label{app:calc}}
+\section{Average step length\label{app:calc:ave_length}}
+
+As demonstrated in \cref{sec:1dRW_distance}, the average step length for any given step-length distribution, where we are taking into account the possibility of truncation, is given by
+\begin{equation}
+\begin{split}
+\label{eq:app_calc:ave_length}
+\E{\abs{l}} &= \int_{-(a-r_v)}^{-\lmin} \abs{\ell} p(\ell) d\ell + \int_{\lmin}^{\lambda - r_v - a} \abs{\ell} p(\ell) d\ell\\
+&+ (a-r_v)\int_{-\infty}^{-(a-r_v)} p(\ell) d\ell + (\lambda - r_v - a)\int_{(\lambda - r_v - a)}^\infty p(\ell)d\ell,
+\end{split}
+\end{equation}
+where the first or second integral become zero for steps beginning near the boundaries at $r_v$ or $\lambda-r_v$, respectively. Similarly, the third and fourth integral's limits are adjusted slightly for steps beginning near either $r_v$ or $\lambda-r_v$, respectively.
+
+Therefore, the average step length for each distribution will have three separate cases to consider, depending on the starting location of a step.
+
+When the distribution also has an upper limit on the step size, $\lmax$, then we will also have to make further adjustments to the limits of integration, which will result in even more cases to consider.
+
+We can rewrite \cref{eq:app_calc:ave_length} for this situation, as four separate cases, depending on the value of $\lmax$. Firstly, if $\lmax \geq a-r_v$ and $\lmax \geq \lambda-a-r_v$, we get
+\begin{equation}
+\begin{split}
+\label{eq:app_calc:ave_length_lmax1}
+\E{\abs{\ell}} &= \int_{-(a-r_v)}^{-\lmin} \abs{\ell} p(\ell) d\ell + \int_{\lmin}^{\lambda - r_v - a} \abs{\ell} p(\ell) d\ell\\
+&+ (a-r_v)\int_{-\lmax}^{-(a-r_v)} p(\ell) d\ell + (\lambda - r_v - a)\int_{(\lambda - r_v - a)}^{\lmax} p(\ell)d\ell.
+\end{split}
+\end{equation}
+If $\lmax \geq a-r_v$ and $\lmax < \lambda-a-r_v$,
+\begin{equation*}
+\begin{split}
+\label{eq:app_calc:ave_length_lmax2}
+\E{\abs{\ell}} &= \int_{-(a-r_v)}^{-\lmin} \abs{\ell} p(\ell) d\ell + \int_{\lmin}^{\lmax} \abs{\ell} p(\ell) d\ell\\
+&+ (a-r_v)\int_{-\lmax}^{-(a-r_v)} p(\ell) d\ell.
+\end{split}
+\end{equation*}
+If $\lmax < a-r_v$ and $\lmax \geq \lambda-a-r_v$,
+\begin{equation*}
+\begin{split}
+\label{eq:app_calc:ave_length_lmax3}
+\E{\abs{\ell}} &= \int_{-\lmax}^{-\lmin} \abs{\ell} p(\ell) d\ell + \int_{\lmin}^{\lambda - r_v - a} \abs{\ell} p(\ell) d\ell\\
+&+ (\lambda - r_v - a)\int_{(\lambda - r_v - a)}^{\lmax} p(\ell)d\ell.
+\end{split}
+\end{equation*}
+If $\lmax < a-r_v$ and $\lmax < \lambda-a-r_v$,
+\begin{equation*}
+\label{eq:app_calc:ave_length_lmax4}
+\E{\abs{\ell}} = \int_{-\lmax}^{-\lmin} \abs{\ell} p(\ell) d\ell + \int_{\lmin}^{\lmax} \abs{\ell} p(\ell) d\ell.
+\end{equation*}
+We can also note that as $\lmax \to \infty$,  \cref{eq:app_calc:ave_length_lmax1} approaches \cref{eq:app_calc:ave_length} as expected.
+
+These above expressions are valid when the forager is not near a boundary, that is, when $r_v + \lmin \leq a \leq \lambda - r_v - \lmin$. When the forager is close to the boundaries, we must adjust some of the limits of integration. Since the first two integrals in \cref{eq:app_calc:ave_length_lmax1} represent steps that land within the boundary, which aren't necessarily possible when next to the boundary, we must remove some of the integrals too.
+
+For the left boundary, $r_v < a < r_v + \lmin$, we get when $\lmax \geq a-r_v$ and $\lmax \geq \lambda-a-r_v$,
+\begin{equation*}
+\begin{split}
+\label{eq:app_calc:ave_length_lmax1_left}
+\E{\abs{\ell}} &= \int_{\lmin}^{\lambda - r_v - a} \abs{\ell} p(\ell) d\ell + (a-r_v)\int_{-\lmax}^{-\lmin} p(\ell) d\ell\\
+&+ (\lambda - r_v - a)\int_{(\lambda - r_v - a)}^{\lmax} p(\ell)d\ell.
+\end{split}
+\end{equation*}
+If $\lmax \geq a-r_v$ and $\lmax < \lambda-a-r_v$,
+\begin{equation*}
+\label{eq:app_calc:ave_length_lmax2_left}
+\E{\abs{\ell}} =\int_{\lmin}^{\lmax} \abs{\ell} p(\ell) d\ell + (a-r_v)\int_{-\lmax}^{-\lmin} p(\ell) d\ell.
+\end{equation*}
+The case of $\lmax < a-r_v$ and $\lmax \geq \lambda-a-r_v$ does not exist, since it would require $\lmax < \lmin$, and likewise for the case of $\lmax < a-r_v$ and $\lmax < \lambda-a-r_v$.
+
+Based on these, we may also conclude that for a step-length distribution with no upper bound on the step size, at the left boundary we get,
+\begin{equation}
+\begin{split}
+\label{eq:app_calc:ave_length_left}
+\E{\abs{\ell}} &= \int_{\lmin}^{\lambda - r_v - a} \abs{\ell} p(\ell) d\ell + (a-r_v)\int_{-\infty}^{-\lmin} p(\ell) d\ell\\
+&+ (\lambda - r_v - a)\int_{(\lambda - r_v - a)}^{\infty} p(\ell)d\ell.
+\end{split}
+\end{equation}
+
+For steps near the right boundary, $\lambda-r_v-\lmin < a < \lambda -r_v$, we get when $\lmax \geq a-r_v$ and $\lmax \geq \lambda-a-r_v$,
+\begin{equation*}
+\begin{split}
+\label{eq:app_calc:ave_length_lmax1_right}
+\E{\abs{\ell}} &= \int_{-(a-r_v)}^{-\lmin} \abs{\ell} p(\ell) d\ell + (a-r_v)\int_{-\lmax}^{-(a-r_v)} p(\ell) d\ell\\
+&+ (\lambda - r_v - a)\int_{\lmin}^{\lmax} p(\ell)d\ell.
+\end{split}
+\end{equation*}
+If $\lmax < a-r_v$ and $\lmax \geq \lambda-a-r_v$,
+\begin{equation*}
+\begin{split}
+\label{eq:app_calc:ave_length_lmax3_right}
+\E{\abs{\ell}} &= \int_{-\lmax}^{-\lmin} \abs{\ell} p(\ell) d\ell\\
+&+ (\lambda - r_v - a)\int_{\lmin}^{\lmax} p(\ell)d\ell.
+\end{split}
+\end{equation*}
+The case of $\lmax \geq a-r_v$ and $\lmax < \lambda-a-r_v$ does not exist, since it would require $\lmax < \lmin$, and likewise for the case of $\lmax < a-r_v$ and $\lmax < \lambda-a-r_v$,
+
+Based on these, we may also conclude that for a step-length distribution with no upper bound on the step size, near the right boundary we get,
+\begin{equation}
+\begin{split}
+\label{eq:app_calc:ave_length_right}
+\E{\abs{\ell}} &= \int_{\lmin}^{\lambda - r_v - a} \abs{\ell} p(\ell) d\ell + (a-r_v)\int_{-\infty}^{-\lmin} p(\ell) d\ell\\
+&+ (\lambda - r_v - a)\int_{(\lambda - r_v - a)}^{\infty} p(\ell)d\ell.
+\end{split}
+\end{equation}
+
+Thus, all up we have 8 different cases to consider for each distribution --- two near the left boundary, four in the centre, and two near the right boundary. If the distribution doesn't have a maximum step size, then we have only 3 cases to consider. Fortunately, all 10 cases are made up of combinations of integrals which only take 6 different forms, 3 of which are:
+\begin{equation}
+\label{eq:app1:intcase1}
+\int_{c}^{d} \abs{\ell}p(\ell)d\ell, \quad c,d \in \mathbb{R}^+,
+\end{equation}
+\begin{equation}
+\label{eq:app1:intcase2}
+\int_{c}^{d} p(\ell)d\ell, \quad c,d \in \mathbb{R}^+,
+\end{equation}
+\begin{equation}
+\label{eq:app1:intcase3}
+\int_{c}^{\infty} p(\ell)d\ell, \quad c \in \mathbb{R}^+,
+\end{equation}
+and then, due to the symmetry of $p(\ell)$, the remaining three integrals are equivalent to integrals~\ref{eq:app1:intcase1},~\ref{eq:app1:intcase2}, and \ref{eq:app1:intcase3}, respectively:
+\begin{equation}
+\int_{-d}^{-c} \abs{\ell}p(\ell)d\ell, \quad c,d \in \mathbb{R}^+,
+\end{equation}
+\begin{equation}
+\int_{-d}^{-c} p(\ell)d\ell, \quad c,d \in \mathbb{R}^+,
+\end{equation}
+\begin{equation}
+\int_{-\infty}^{-c} p(\ell)d\ell, \quad c \in \mathbb{R}^+.
+\end{equation}
+
+Thus, finding the expected cost of a step for each step-length distribution amounts to not much more than solving integrals~\ref{eq:app1:intcase1},~\ref{eq:app1:intcase2}, and \ref{eq:app1:intcase3} and rearranging. Furthermore, for distributions \emph{without} an upper bound on the step size, integrals of the same form as integral~\ref{eq:app1:intcase2} never appear, and distributions \emph{with} an upper bound have no integrals of the same form as integral~\ref{eq:app1:intcase3}. 
+
+As discussed in \cref{sec:1d_discrete}, to find the discretized equivalents of these expressions, we make the replacements:
+\[\lmin = m_0 \Delta x, \quad \lmax = m_m \Delta x, \quad r_v = m_r \Delta x, \quad m_0,m_m,m_r \in \mathbb{Z}. \]
+
+We find the exact expressions for the unbounded power-law distribution, and show that there are some small differences between our results and the expressions listed by Bartumeus \etal \cite{Bartumeus_2013}, which we explain is most likely due to a typo. We also present the discretized equivalents of the expressions for the unbounded power-law distribution. 
+
+For the other step-length distributions, we simply present the solutions without showing any of the working.
+
+\subsection{Unbounded power-law distribution}
+Recall that an unbounded power-law distribution, where we allow both positive and negative values is:
+\begin{equation*}
+p(\ell) = C \abs{\ell}^{-\mu}, \quad \abs{\ell} \geq \lmin,
+\end{equation*}
+where \[C = \frac{(\mu - 1)}{2}\lmin^{\mu - 1}.\]
+We can represent the support of the distribution by rewriting this as
+\[p(\ell) =  C \left| \ell \right|^{-\mu} \theta(|\ell| - \lmin) , \]
+and \[\theta(x) = \begin{cases}
+		1 \quad &\text{if }x \geq 0,\\
+		0 \quad &\text{otherwise}.
+\end{cases}\]
+
+For the unbounded power-law distribution, integral~\ref{eq:app1:intcase1} is given by
+\begin{align*}
+\int_{c}^{d} \abs{\ell} p(\ell) d\ell &= \int_{c}^{d}\frac{(\mu - 1)}{2}\lmin^{\mu - 1} \abs{\ell}^{1-\mu}  d\ell\\
+&= \frac{(\mu - 1)}{2}\lmin^{\mu - 1} \int_{c}^{d} (\ell)^{1-\mu}  d\ell
+\end{align*}
+for $\mu \neq 2$:
+\begin{align*}
+\int_{c}^{d} \abs{\ell} p(\ell) d\ell  &= \frac{(\mu - 1)}{2}\lmin^{\mu - 1} \left[\frac{\ell^{2-\mu}}{2-\mu} \right]^{d}_{c}  \\
+&= \frac{(\mu - 1)}{2}\lmin^{\mu - 1} \left[\frac{d^{2-\mu} - c^{2-\mu}}{2-\mu} \right]
+\end{align*}
+and for $\mu = 2$:
+\begin{align*}
+\int_{c}^{d} \abs{\ell} p(\ell) d\ell  &= \frac{\lmin}{2} \left[ \log(\ell) \right]^{d}_{c}  \\
+&= \frac{\lmin}{2}  \left[\log(d) - \log(c)\right]\\
+&= \frac{\lmin}{2}  \log\left(\frac{d}{c} \right).
+\end{align*}
+Integral~\ref{eq:app1:intcase3} is given by
+\begin{align*}
+\int_{c}^\infty p(\ell)d\ell &= \int_{c}^\infty \frac{(\mu - 1)}{2}\lmin^{\mu - 1} \abs{\ell}^{-\mu}d\ell\\
+&= \frac{(\mu - 1)}{2}\lmin^{\mu - 1} \int_{c}^\infty  (\ell)^{-\mu}d\ell\\
+&= \frac{(\mu - 1)}{2}\lmin^{\mu - 1} \left[\frac{\ell^{1-\mu}}{1-\mu} \right]_{c}^\infty \\
+&=\frac{(\mu - 1)}{2}\lmin^{\mu - 1} \left[\frac{-c^{1-\mu}}{1-\mu} \right]\\
+&=\frac{1}{2}\left(\frac{c}{\lmin}\right)^{1-\mu}.
+\end{align*}
+
+For the unbounded power-law distribution we have no upper bound on the step length, and hence there are only three cases to consider: near the left boundary, in the centre, and near the right boundary, which correspond to \cref{eq:app_calc:ave_length_left,eq:app_calc:ave_length,eq:app_calc:ave_length_right}, respectively. However, we do get two different expressions for each, depending on whether or not $\mu = 2$, making six expressions total.
+
+For steps beginning near the left boundary, specifically for $r_v < a < r_v + \lmin$, when $\mu \neq 2$ we get
+\begin{align}
+\E{\abs{\ell}} &= \int_{\lmin}^{\lambda - r_v - a} \abs{\ell} p(\ell) d\ell + (a-r_v)\int_{-\infty}^{-\lmin} p(\ell) d\ell \nonumber \\
+&+ (\lambda - r_v - a)\int_{(\lambda - r_v - a)}^{\infty} p(\ell)d\ell \nonumber \\ \nonumber\\
+&= \frac{(\mu - 1)}{2}\lmin^{\mu - 1} \left[\frac{(\lambda-r_v-a)^{2-\mu} - \lmin^{2-\mu}}{2-\mu} \right]+ (a-r_v)\frac{1}{2}\left(\frac{\lmin}{\lmin}\right)^{1-\mu} \nonumber \\
+&+ (\lambda - r_v - a)\frac{1}{2}\left(\frac{\lambda-r_v-a}{\lmin}\right)^{1-\mu}\nonumber \\ \nonumber \\
+&= \frac{(a-r_v)}{2} + \frac{\lmin (1-\mu)}{2(2-\mu)} \left[ 1 + \frac{((\lambda-a-r_v)/\lmin)^{2-\mu}}{1-\mu} \right]\label{eq:app_calc:ave_step_length:powerlawL},
+\end{align}
+and when $\mu=2$ we get
+\begin{align}
+\E{\abs{\ell}} &= \frac{\lmin}{2} \left[ \log \left(\frac{\lambda - a-r_v}{\lmin} \right) + 1 \right] + \frac{(a-r_v)}{2}\nonumber \\
+&= \frac{(a-r_v)}{2} + \frac{\lmin}{2} \left[ 1 + \log((\lambda-a-r_v)/\lmin) \right]\label{eq:app_calc:ave_step_length:powerlawL_mu2},
+\end{align}
+which agree with the expressions from Bartumeus \etal \cite{Bartumeus_2013}.
+
+
+For the middle of the search space, which is valid for $r_v + \lmin \leq a \leq \lambda-r_v-\lmin$, when $\mu \neq 2$ we get
+\begin{align}
+\E{\abs{\ell}} &= \int_{-(a-r_v)}^{-\lmin} \abs{\ell} p(\ell) d\ell + \int_{\lmin}^{\lambda - r_v - a} \abs{\ell} p(\ell) d\ell \nonumber\\
+&+ (a-r_v)\int_{-\infty}^{-(a-r_v)} p(\ell) d\ell + (\lambda - r_v - a)\int_{(\lambda - r_v - a)}^\infty p(\ell)d\ell \nonumber\\\nonumber\\
+&= \frac{(\mu - 1)}{2}\lmin^{\mu - 1} \left[\frac{(a-r_v)^{2-\mu} - \lmin^{2-\mu}}{2-\mu} \right] + \frac{(\mu - 1)}{2}\lmin^{\mu - 1} \left[\frac{(\lambda-r_v-a)^{2-\mu} - \lmin^{2-\mu}}{2-\mu} \right]\nonumber\\
+&+ (a-r_v)\frac{1}{2}\left(\frac{a-r_v}{\lmin}\right)^{1-\mu} + (\lambda - r_v - a)\frac{1}{2}\left(\frac{\lambda-r_v-a}{\lmin}\right)^{1-\mu} \nonumber \\ \nonumber \\
+&= \frac{\lmin(1-\mu)}{2(2-\mu)}\left[ 2 + \frac{((a-r_v)/\lmin)^{2-\mu}}{1-\mu} + \frac{((\lambda - a- r_v)/\lmin)^{2-\mu}}{1-\mu} \right]\label{eq:app_calc:ave_step_length:powerlawM},
+\end{align}
+and for $\mu = 2$ we get
+\begin{align}
+\E{\abs{\ell}}&=\lmin \left[ 1 + \log \left(\frac{[(\lambda-a-r_v)(a-r_v)]^{1/2}}{\lmin} \right) \right]\label{eq:app_calc:ave_step_length:powerlawM_mu2}.
+\end{align}
+These two expressions are not consistent with Bartumeus \etal \cite{Bartumeus_2013}.
+
+For steps beginning near the right boundary, specifically for $\lambda-r_v-\lmin < a < \lambda-r_v$, when $\mu \neq 2$ we get
+\begin{align}
+\E{\abs{\ell}} &= \int_{\lmin}^{\lambda - r_v - a} \abs{\ell} p(\ell) d\ell + (a-r_v)\int_{-\infty}^{-(a-r_v)} p(\ell) d\ell \nonumber \\
+&+ (\lambda - r_v - a)\int_{\lmin}^{\infty} p(\ell)d\ell \nonumber\\ \nonumber \\
+&= \frac{(\mu - 1)}{2}\lmin^{\mu - 1} \left[\frac{(\lambda-r_v-a)^{2-\mu} - \lmin^{2-\mu}}{2-\mu} \right]+ (a-r_v)\frac{1}{2}\left(\frac{a-r_v}{\lmin}\right)^{1-\mu}\nonumber \\
+&+ (\lambda - r_v - a)\frac{1}{2}\left(\frac{\lmin}{\lmin}\right)^{1-\mu} \nonumber \\ \nonumber \\
+&= \frac{(\lambda-a-r_v)}{2} + \frac{\lmin (1-\mu)}{2(2-\mu)} \left[ 1 + \frac{((a-r_v)/\lmin)^{2-\mu}}{1-\mu} \right]\label{eq:app_calc:ave_step_length:powerlawR},
+\end{align}
+and for $\mu = 2$ we get
+\begin{align}
+\E{\abs{\ell}} &= \frac{(\lambda -a-r_v)}{2} + \frac{\lmin}{2} \left[ 1 + \log((a-r_v)/\lmin) \right]\label{eq:app_calc:ave_step_length:powerlawR_mu2}.
+\end{align}
+These two expressions are also not consistent with Bartumeus \etal \cite{Bartumeus_2013}. However, after solving all three cases, we can now see that they have not made an error with their mathematics, but rather, have listed the middle expression as the left expression, and vice versa.
+
+The discretized versions of  \cref{eq:app_calc:ave_step_length:powerlawL,eq:app_calc:ave_step_length:powerlawL_mu2,eq:app_calc:ave_step_length:powerlawM,eq:app_calc:ave_step_length:powerlawM_mu2,eq:app_calc:ave_step_length:powerlawR,eq:app_calc:ave_step_length:powerlawR_mu2} are listed below.
+
+
+When $\mu \neq 2$, for the left, middle, and right sections, respectively:
+\begin{equation*}
+\label{eq:app_calc:ave_step_length:powerlawL_discrete}
+\E{\abs{\ell}}_{i_a}= \frac{(i_a-m_r)\Delta x}{2} + \frac{m_0 \Delta x (1-\mu)}{2(2-\mu)} \left[ 1 + \frac{((M - i_a -m_r)/m_0)^{2-\mu}}{1-\mu} \right],
+\end{equation*}
+
+\begin{equation*}
+\label{eq:app_calc:ave_step_length:powerlawM_discrete}
+\E{\abs{\ell}}_{i_a} = \frac{m_0 \Delta x(1-\mu)}{2(2-\mu)}\left[ 2 + \frac{((i_a - m_r)/m_0)^{2-\mu}}{1-\mu} + \frac{((M - i_a -m_r)/m_0)^{2-\mu}}{1-\mu} \right],
+\end{equation*}
+
+\begin{equation*}
+\label{eq:app_calc:ave_step_length:powerlawR_discrete}
+\E{\abs{\ell}}_{i_a} = \frac{(M-i_a-m_r)\Delta x}{2} + \frac{m_0 \Delta x (1-\mu)}{2(2-\mu)} \left[ 1 + \frac{((i_a-m_r)/m_0)^{2-\mu}}{1-\mu} \right].
+\end{equation*}
+
+When $\mu =2$, for the left, middle, and right sections, respectively:
+\begin{equation*}
+\label{eq:app_calc:ave_step_length:powerlawL_mu2_discrete}
+\E{\abs{\ell}}_{i_a}= \frac{(i_a-m_r)\Delta x}{2} + \frac{m_0 \Delta x}{2} \left[ 1 + \log((M-i_a-m_r)/m_0) \right],
+\end{equation*}
+
+\begin{equation*}
+\label{eq:app_calc:ave_step_length:powerlawM_mu2_discrete}
+\E{\abs{\ell}}_{i_a}= m_0 \Delta x \left[ 1 + \log \left(\frac{[(M-i_a-m_r)(i_a-m_r)]^{1/2}}{m_0} \right) \right],
+\end{equation*}
+
+\begin{equation*}
+\label{eq:app_calc:ave_step_length:powerlawR_mu2_discrete}
+\E{\abs{\ell}}_{i_a} = \frac{(M-i_a-m_r)\Delta x}{2} + \frac{m_0 \Delta x}{2} \left[ 1 + \log((i_a-m_r)/m_0) \right].
+\end{equation*}
+
+
+
+
+\subsection{Bounded power-law distribution}
+A bounded power-law distribution, where we allow both positive and negative values is given by:
+\[p(\ell) = C \abs{\ell}^{-\mu}, \quad \abs{\ell} \in [\lmin,\lmax],\]
+where \[C = \frac{(\mu - 1)}{2(\lmin^{1-\mu} - \lmax^{1-\mu})}.\]
+As with the unbounded power-law distribution, we may represent the support of the distribution using the function $\theta$, giving
+\[p(\ell) =  C \abs{\ell}^{-\mu} \theta(\abs{\ell} - \lmin) \theta(\lmax - \abs{\ell}), \]
+where \[\theta(x) = \begin{cases}
+1 \quad &\text{if }x \geq 0,\\
+0 \quad &\text{otherwise}.
+\end{cases}\]
+
+
+For the bounded power-law distribution, we will have 10 different cases to consider. Recall that to solve all of these expressions, we essentially only need to solve two different integrals.
+
+
+For steps beginning near the left boundary, specifically for $r_v < a < r_v + \lmin$ and when $\lmax \geq a-r_v$ and $\lmax \geq \lambda-a-r_v$, we get for $\mu\neq 2$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{(\mu-1)}{2(\mu-2)(\lmax^{1-\mu} - \lmin^{1-\mu})} \left( \frac{(\lambda-r_v-a)^{2-\mu}}{\mu-1} - \lmin^{2-\mu}+ \frac{(\mu-2)}{(\mu-1)}(\lambda-r_v-a)\lmax^{1-\mu}\right)+ \frac{a-r_v}{2},
+\end{align*}
+and if $\mu=2$:
+\begin{align*}
+\E{\abs{\ell}}&=\frac{\lmin\lmax}{2(\lmax-\lmin)} \left(\log\left(\frac{\lambda-r_v-a}{\lmin}\right) + 1 - \frac{\lambda-r_v-a}{\lmax} \right) + \frac{a-r_v}{2}
+\end{align*}
+For steps beginning near the left boundary and for $\lmax \geq a-r_v$ and $\lmax < \lambda-a-r_v$, when $\mu \neq 2$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{(\mu-2)(\lmax^{2-\mu} - \lmin^{2-\mu})}{2 (\mu-2) (\lmax^{1-\mu} - \lmin^{1-\mu})} + \frac{a-r_v}{2}
+\end{align*}
+and when $\mu=2$:
+\begin{align*}
+E{\abs{\ell}}&=\frac{\lmin \lmax}{2(\lmax - \lmin)} \log\left(\frac{\lmax}{\lmin}\right) + \frac{a-r_v}{2}
+\end{align*}
+
+Both cases when $\lmax < a-r_v$ do not exist for steps beginning near the left boundary.
+
+Next, we consider steps in the middle of the search space, not near either boundary, specifically for $r_v+\lmin \leq  a \leq \lambda-r_v-\lmin$. When $\lmax \geq a-r_v$ and $\lmax \geq \lambda-a-r_v$, we get for $\mu\neq 2$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{(a-r_v)^{2-\mu} + (\lambda-r_v-a)^{2-\mu} - 2(\mu-1)\lmin^{2-\mu}}{2 (\mu-2)(\lmax^{1-\mu} - \lmin^{1-\mu})}\\
+&+ \frac{\lmax^{1-\mu}}{2(\lmax^{1-\mu} - \lmin^{1-\mu})} \left( (a-r_v) + (\lambda-r_v-a) \right),
+\end{align*}
+and if $\mu=2$:
+\begin{align*}
+\E{\abs{\ell}}&=\frac{\lmin\lmax}{2(\lmax-\lmin)} \left(\log\left(\frac{a-r_v}{\lmin}\right) + \log\left(\frac{\lambda-r_v-a}{\lmin}\right)- \frac{\lambda - 2r_v}{\lmax} + 2 \right).
+\end{align*}
+
+For $\lmax < a-r_v$ and $\lmax \geq \lambda-a-r_v$, when $\mu \neq 2$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{(\mu-1)}{2 (\mu-2) (\lmax^{1-\mu} - \lmin^{1-\mu})} \left( \lmax^{2-\mu} +\frac{(\lambda-r_v-a)^{2-\mu}}{\mu-1} - 2\lmin^{2-\mu} + \frac{\mu-2}{\mu-1}(\lambda-r_v-a)\lmax^{1-\mu} \right)
+\end{align*}
+and when $\mu=2$:
+\begin{align*}
+\E{\abs{\ell}}&=\frac{\lmin \lmax}{2(\lmax - \lmin)} \left(\log\left(\frac{\lmax}{\lmin}\right) + \log\left(\frac{\lambda-r_v-a}{\lmin}\right) - \frac{\lambda-r_v-a}{\lmax} + 1 \right).
+\end{align*}
+
+
+For $\lmax \geq a-r_v$ and $\lmax < \lambda-a-r_v$, when $\mu \neq 2$:
+\begin{align*}
+\E{\abs{\ell}} &= \frac{(\mu-1)}{2(\mu-2)(\lmax^{1-\mu} - \lmin^{1-\mu})} \left( \lmax^{2-\mu} + \frac{(a-r_v)^{2-\mu}}{\mu-1} - 2\lmin^{2-\mu} +\frac{(\mu-2) \lmax^{1-\mu} (a-r_v)}{\mu-1}  \right),
+\end{align*}
+and when $\mu=2$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{\lmin \lmax}{2(\lmax - \lmin)} \left( \log \left( \frac{\lmax (a-r_v)}{\lmin^2}\right) - \frac{a-r_v}{\lmax} + 1\right)
+\end{align*}
+For $\lmax < a-r_v$ and $\lmax < \lambda-a-r_v$, when $\mu \neq 2$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{(\mu - 1)(\lmax^{2-\mu} - \lmin^{2-\mu})}{(\mu - 2)(\lmax^{1-\mu} - \lmin^{1-\mu})},
+\end{align*}
+and when $\mu = 2$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{\lmin \lmax}{(\lmax - \lmin)} \log\left(\frac{\lmax}{\lmin}\right).
+\end{align*}
+
+Finally, we consider steps beginning near the right boundary, specifically for $\lambda-r_v- \lmin < a < \lambda-r_v$. When $\lmax \geq a-r_v$ and $\lmax \geq \lambda-a-r_v$, we get for $\mu\neq 2$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{(\mu-1)}{2(\mu-2)(\lmax^{1-\mu} - \lmin^{1-\mu})} \left(\frac{(a-r_v)^{2-\mu}}{\mu-1} + \frac{(\mu-2)}{(\mu-1)}(a-r_v)\lmax^{1-\mu} - \lmin^{2-\mu} \right) + \frac{\lambda-r_v-a}{2}
+\end{align*}
+and if $\mu=2$:
+\begin{align*}
+E{\abs{\ell}}&=\frac{\lmin\lmax}{2(\lmax-\lmin)} \left(\log\left(\frac{a-r_v}{\lmin}\right) + 1 - \frac{a-r_v}{\lmax} \right) + \frac{\lambda-r_v-a}{2}
+\end{align*}
+For $\lmax < a-r_v$ and $\lmax \geq \lambda-a-r_v$, when $\mu \neq 2$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{(\mu-2)(\lmax^{2-\mu} - \lmin^{2-\mu})}{2 (\mu-2) (\lmax^{1-\mu} - \lmin^{1-\mu})} + \frac{\lambda-r_v-a}{2}
+\end{align*}
+and when $\mu=2$:
+\begin{align*}
+\E{\abs{\ell}}&=\frac{\lmin \lmax}{2(\lmax - \lmin)} \log\left(\frac{\lmax}{\lmin}\right) + \frac{\lambda-r_v-a}{2}
+\end{align*}
+
+Both cases when $\lmax < \lambda-a-r_v$ do not exist for steps beginning near the right boundary.
+
+\subsection{Unbounded exponential distribution}
+The probability density function of an unbounded exponential distribution, where we allow both positive and negative values is:
+\begin{equation*}
+p(\ell) = \frac{\mu e^{-\mu(\abs{\ell}-\lmin)}}{2} , \quad \abs{\ell} \geq \lmin.
+\end{equation*}
+%where \[C = \frac{(\mu - 1)}{2}\lmin^{\mu - 1}.\]
+We can represent the support of the distribution by rewriting this as
+\[p(\ell) =  \frac{\mu e^{-\mu(\abs{\ell}-\lmin)} \theta(|\ell| - \lmin) }{2} , \]
+and \[\theta(x) = \begin{cases}
+1 \quad &\text{if }x \geq 0,\\
+0 \quad &\text{otherwise}.
+\end{cases}\]
+
+For the unbounded exponential distribution we have no upper bound on the step length, and hence there are only three cases to consider: near the left boundary, in the centre, and near the right boundary, which correspond to \cref{eq:app_calc:ave_length_left,eq:app_calc:ave_length,eq:app_calc:ave_length_right}, respectively.
+
+For steps beginning near the left boundary, specifically for $r_v < a < r_v + \lmin$, we get
+\begin{align}
+\E{\abs{\ell}} &=\frac{1 + \mu(a-r_v + \lmin) - e^{-\mu(\lambda-r_v-\lmin -a)}}{2\mu}\label{eq:app_calc:ave_step_length:exponentialL}.
+\end{align}
+
+
+For the middle of the search space, which is valid for $r_v + \lmin \leq a \leq \lambda-r_v-\lmin$, we get
+\begin{align}
+\E{\abs{\ell}} &=\frac{2(\mu \lmin +1) - e^{-\mu(a-r_v-\lmin)} - e^{-\mu(\lambda-r_v-\lmin-a)}}{2\mu}.
+\label{eq:app_calc:ave_step_length:exponentialM}.
+\end{align}
+
+For steps beginning near the right boundary, specifically for $\lambda-r_v-\lmin < a < \lambda-r_v$, we get
+\begin{align}
+\E{\abs{\ell}} &=\frac{1 + \mu(\lambda-r_v-a + \lmin) - e^{-\mu(a-r_v-\lmin)}}{2\mu}
+\label{eq:app_calc:ave_step_length:exponentialR}.
+\end{align}
+
+The discretized versions of  \cref{eq:app_calc:ave_step_length:exponentialL,eq:app_calc:ave_step_length:exponentialM,eq:app_calc:ave_step_length:exponentialR} are listed below.
+
+
+For the left, middle, and right sections, respectively:
+\begin{equation*}
+\label{eq:app_calc:ave_step_length:exponentialL_discrete}
+\E{\abs{\ell}}_{i_a}= \frac{1 + \mu(i_a-m_r + m_0)\Delta x - e^{-\mu(M-m_r-m0-i_a)\Delta x}}{2\mu},
+\end{equation*}
+
+\begin{equation*}
+\label{eq:app_calc:ave_step_length:exponentialM_discrete}
+\E{\abs{\ell}}_{i_a} = \frac{2(\mu m_0\Delta x +1) - e^{-\mu(i_a-m_r-m_0)\Delta x} - e^{-\mu(M-m_r-m_0-i_a)\Delta x}}{2\mu},
+\end{equation*}
+
+\begin{equation*}
+\label{eq:app_calc:ave_step_length:exponentialR_discrete}
+\E{\abs{\ell}}_{i_a} = \frac{1 + \mu(M-m_r-i_a+m_0)\Delta x - e^{-\mu(i_a-m_r-m_0)\Delta x}}{2\mu}.
+\end{equation*}
+
+\subsection{Bounded exponential distribution}
+A bounded exponential distribution, where we allow both positive and negative values is given by:
+\[p(\ell) = C e^{-\mu \abs{\ell}}, \quad \abs{\ell} \in [\lmin,\lmax],\]
+where \[C = \frac{\mu}{2\left(e^{-\mu \lmin} - e^{-\mu \lmax}\right)}.\]
+As with the other distributions, we may represent the support of the distribution using the function $\theta$, giving
+\[p(\ell) =  C e^{-\mu \abs{\ell}} \theta(\abs{\ell} - \lmin) \theta(\lmax - \abs{\ell}), \]
+where \[\theta(x) = \begin{cases}
+1 \quad &\text{if }x \geq 0,\\
+0 \quad &\text{otherwise}.
+\end{cases}\]
+
+We begin by considering steps beginning near the left boundary, specifically for $r_v < a < r_v + \lmin$. When $\lmax \geq a-r_v$ and $\lmax \geq \lambda-a-r_v$, we get:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{a-r_v}{2} + \frac{ (\mu \lmin + 1)e^{-\mu \lmin} - \mu(\lambda-r_v-a)e^{-\mu \lmax} - e^{-\mu(\lambda-r_v-a)} } {2\mu \left(e^{-\mu \lmin} - e^{-\mu \lmax}\right) }.
+\end{align*}
+
+For $\lmax \geq a-r_v$ and $\lmax < \lambda-a-r_v$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{a-r_v}{2} + \frac{1}{2\mu} + \frac{\lmin e^{-\mu \lmin} - \lmax e^{-\mu \lmax}}{2\left(e^{-\mu \lmin} - e^{-\mu \lmax}\right)}.
+\end{align*}
+
+Both cases where $\lmax < a-r_v$ do not exist.
+
+Next, we consider steps in the middle of the search space, not near either boundary, specifically for $r_v+\lmin \leq  a \leq \lambda-r_v-\lmin$. When $\lmax \geq a-r_v$ and $\lmax \geq \lambda-a-r_v$, we get:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{ 2(\mu \lmin+1) e^{-\mu \lmin} -e^{-\mu(a-r_v)} - e^{-\mu(\lambda-r_v-a)} - \mu(\lambda-2r_v)e^{-\mu \lmax} }{2\mu \left(e^{-\mu \lmin} - e^{-\mu \lmax}\right) }.
+\end{align*}
+
+For $\lmax < a-r_v$ and $\lmax \geq \lambda-a-r_v$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{ 2(\mu \lmin +1) e^{-\mu \lmin} - (\mu(\lmax + \lambda -r_v-a)+1)e^{-\mu \lmax} - e^{-\mu(\lambda-r_v-a)} }{2\mu \left(e^{-\mu \lmin} - e^{-\mu \lmax}\right)}.
+\end{align*}
+
+
+For $\lmax \geq a-r_v$ and $\lmax < \lambda-a-r_v$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{ 2(\mu \lmin +1) e^{-\mu \lmin} - (\mu(\lmax + a-r_v)+1)e^{-\mu \lmax} - e^{-\mu(a-r_v)} }{2\mu \left(e^{-\mu \lmin} - e^{-\mu \lmax}\right)}.
+\end{align*}
+
+For $\lmax < a-r_v$ and $\lmax < \lambda-a-r_v$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{1}{\mu} + \frac{\lmin e^{-\mu \lmin} - \lmax e^{-\mu \lmax}}{\left(e^{-\mu \lmin} - e^{-\mu \lmax}\right)}.
+\end{align*}
+
+
+
+Finally, we consider steps beginning near the right boundary, specifically for $\lambda-r_v- \lmin < a < \lambda-r_v$. When $\lmax \geq a-r_v$ and $\lmax \geq \lambda-a-r_v$, we get:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{\lambda-r_v-a}{2} + \frac{ (\mu \lmin + 1)e^{-\mu \lmin} - \mu(a-r_v)e^{-\mu \lmax} - e^{-\mu(a-r_v)} } {2\mu \left(e^{-\mu \lmin} - e^{-\mu \lmax}\right) }.
+\end{align*}
+For $\lmax < a-r_v$ and $\lmax \geq \lambda-a-r_v$:
+\begin{align*}
+\E{\abs{\ell}} &=\frac{\lambda-r_v-a}{2} + \frac{1}{2\mu} + \frac{\lmin e^{-\mu \lmin} - \lmax e^{-\mu \lmax}}{2\left(e^{-\mu \lmin} - e^{-\mu \lmax}\right)}.
+\end{align*}
+
+Both cases when $\lmax < \lambda-a-r_v$ do not exist.
+
+
+\section{Discretized probability distribution matrix}
+The elements of the matrix $A$ are derived using
+\[[A]_{k,j} = [A]_{j,k} = \int_{|k-j|\Delta x}^{(|k-j|+1)\Delta x} p(\ell) d\ell,\quad k \neq j. \]
+
+
+\subsection{Unbounded power-law distribution}
+For an unbounded power law distribution we get, $[A]_{k,j}=0$ for $|k-j|<m0$ and for $|k-j| \geq m_0$:
+\begin{align*}
+[A]_{k,j} &=  \int_{|k-j|\Delta x}^{(|k-j|+1)\Delta x} \frac{\mu-1}{2} \lmin^{\mu-1} \abs{\ell}^{-\mu} d\ell\\
+&=\frac{\mu-1}{2} \lmin^{\mu-1} \int_{|k-j|\Delta x}^{(|k-j|+1)\Delta x} \ell^{-\mu}d\ell\\
+&=\frac{\mu-1}{2} \lmin^{\mu-1}  \left[\frac{\ell^{-\mu+1}}{-\mu+1}\right]_{|k-j|\Delta x}^{(|k-j|+1)\Delta x}\\
+&= \frac{\lmin^{\mu-1}}{2} \left[ \frac{1}{(|k-j|\Delta x)^{\mu - 1}} - \frac{1}{((|k-j|+1)\Delta x)^{\mu - 1}} \right]\\
+&= \frac{m_0^{\mu-1}}{2} \left[ \frac{1}{(|k-j|)^{\mu - 1}} - \frac{1}{(|k-j|+1)^{\mu - 1}} \right],
+\end{align*}
+which differs from the result in \cite{Bartumeus_2013} by the factor of $m_0^{\mu-1}$ at the front.
+
+
+
+
+\subsection{Bounded power-law distribution}
+For a bounded power law distribution we get, $[A]_{k,j}=0$ for $|k-j|<m0$ or $\abs{k-j} > m_m-1$, and for $m_0 \leq |k-j| \leq m_m-1$:
+\begin{align*}
+[A]_{k,j} &=  \int_{|k-j|\Delta x}^{(|k-j|+1)\Delta x} \frac{\mu-1}{2(\lmin^{1-\mu} - \lmax^{1-\mu})}  \abs{\ell}^{-\mu} d\ell\\
+&=\frac{\mu-1}{2(\lmin^{1-\mu} - \lmax^{1-\mu})}  \int_{|k-j|\Delta x}^{(|k-j|+1)\Delta x} \ell^{-\mu}d\ell\\
+&=\frac{\mu-1}{2(\lmin^{1-\mu} - \lmax^{1-\mu})}   \left[\frac{\ell^{-\mu+1}}{-\mu+1}\right]_{|k-j|\Delta x}^{(|k-j|+1)\Delta x}\\
+&= \frac{1}{2(\lmin^{1-\mu} - \lmax^{1-\mu})}  \left[ \frac{1}{(|k-j|\Delta x)^{\mu - 1}} - \frac{1}{((|k-j|+1)\Delta x)^{\mu - 1}} \right]\\
+&= \frac{(|k-j|)^{1 - \mu} - (|k-j|+1)^{1 - \mu}}{2(m_0^{1-\mu} - m_m^{1-\mu})},
+\end{align*}
+
+\subsection{Unbounded exponential distribution}
+For the exponential distribution, the matrix $A$ is given by
+\begin{align*}
+[A]_{k,j} &=  \int_{|k-j|\Delta x}^{(|k-j|+1)\Delta x} \frac{\mu e^{-\mu(\abs{\ell}-\lmin)}}{2}  d\ell, \quad \text{for } |k-j| \geq  m_0\\
+&=\frac{\mu e^{\mu \lmin}}{2}  \int_{|k-j|\Delta x}^{(|k-j|+1)\Delta x} e^{-\mu l}d\ell\\
+&=\frac{\mu e^{\mu \lmin}}{2}  \left[ \frac{e^{-\mu l}}{-\mu} \right]_{|k-j|\Delta x}^{(|k-j|+1)\Delta x}\\
+&=\frac{e^{\mu \lmin}}{2} \left[ e^{-\mu|k-j|\Delta x} - e^{-\mu(|k-j|+1)\Delta x} \right]\\
+&=\frac{e^{\mu(m_0 - \abs{k-j})\Delta x}}{2} \left[ 1 - e^{-\mu \Delta x} \right],
+\end{align*}
+and $[A]_{k,j} = 0$ for $|k-j|<m_0$.
+\subsection{Bounded exponential distribution}
+For the bounded exponential distribution, the matrix $A$ is given by
+\begin{align*}
+[A]_{k,j} &=  \int_{|k-j|\Delta x}^{(|k-j|+1)\Delta x} \frac{\mu e^{-\mu \abs{\ell}}}{2\left(e^{-\mu \lmin} - e^{-\mu \lmax}\right)}  d\ell, \quad \text{for } |k-j| \geq  m_0\\
+&=\frac{\mu}{2\left(e^{-\mu \lmin} - e^{-\mu \lmax}\right)}  \int_{|k-j|\Delta x}^{(|k-j|+1)\Delta x} e^{-\mu l}d\ell\\
+&=\frac{\mu}{2\left(e^{-\mu \lmin} - e^{-\mu \lmax}\right)}  \left[ \frac{e^{-\mu l}}{-\mu} \right]_{|k-j|\Delta x}^{(|k-j|+1)\Delta x}\\
+&=\frac{e^{-\mu|k-j|\Delta x} - e^{-\mu(|k-j|+1)\Delta x}}{2\left(e^{-\mu \lmin} - e^{-\mu \lmax}\right)} \\
+&=\frac{ e^{-\mu \abs{k-j} \Delta x} \left(1 - e^{-\mu \Delta x}\right)  }{2\left(e^{-\mu m_0 \Delta x} - e^{-\mu m_m \Delta x}\right)}.
+\end{align*}
+and $[A]_{k,j} = 0$ for $|k-j|<m_0$.

@@ -1,0 +1,367 @@
+%!TEX root = ../thesis.tex
+
+\begin{section}{Literature Review \label{sec:litreview}}
+
+
+\iffalse The search for food is one of the most important factors when investigating animal behaviour, and when considering where an animal travels, it is often the most important factor \cite{}. Animal foraging patterns are often not just patterns of how an animal searches for food, but actually provide insight into an animal's overall movement pattern. The study of how effective an animal's foraging strategy is can act as a very good proxy as to how likely an animal is to survive \cite{}. 
+
+It is this reasoning with which the field of Optimal Foraging Theory hypothesises that animal's should have evolved to use a foraging strategy that is highly optimised. We make it clear that we expect highly optimised models to arise, rather than the most optimal strategy itself, since animal foraging strategies are not indicative of reproduction rate, but rather, the survival rate - and are only a proxy at that.
+
+\fi
+James \etal \cite{James_2011} gave a thorough overview of stochastic optimal foraging theory in 2011, and discussed both the latest results as well as the history of the field.
+Our literature review follows a similar structure to their paper, by first examining in detail a few of the early papers in the field, before discussing various extensions that have been made to the basic model.
+Since this thesis does not investigate any actual movement data, but rather focusses on the theoretical side of the problem, we emphasise the findings and methods of papers that focus on theoretical models. Furthermore, we place the heaviest emphasis on papers that consider various regime-switching strategies or where model parameters such as the radius of vision may vary.
+
+\subsection{Early evidence for L\'{e}vy flight foraging strategies}
+
+\subsubsection{Empirical evidence in favour of L\'{e}vy flights}
+
+The earliest evidence of L\'{e}vy flights in foraging data came in the form of scale-invariance in the activity periods of Drosophila, a genus of fruitfly.
+Cole \cite{Cole_1995} examined the activity periods of said Drosophila, and observed that they appeared to be undergoing activity constantly.
+Upon magnification, this constant activity turned out to be multiple bouts of activity, with short bouts of inactivity between.
+Further magnification revealed that these smaller bouts of activity were once again made up of even smaller episodes of activity with inactivity between these, suggesting a self-similar structure.
+By plotting on a log-log plot the total number of intervals of inactivity as a function of the length of time required to consider a period inactive, a slope of $-1.37 \pm 0.12$ was found, and thus it was concluded that the temporal distribution of the activity of fruitflies has a fractal structure.
+The slope being less than $-1$ implied that the larger the threshold of time that is used to discern between activity and inactivity is, the total amount of time spent inactive increases.
+Finally, Cole concluded that if we assumed the flies moved at a constant rate during active phases, then the fractal switching of movement activity would translate into fractal space use, producing a L\'{e}vy flight. 
+
+Viswanathan \etal \cite{Viswanathan_1996} investigated the presence of long-range correlations in the movement data of wandering albatrosses by considering a random walk, $Y(t)$, to represent the net displacement of an albatross.
+The \emph{mean square displacement} of the albatross is given by 
+\[F(t) = \sqrt{ \E{ \Delta Y(t))^2 } - \E{ \Delta Y(t) }^2}, \]
+where $\Delta Y(t) := Y(t_0+t) - Y(t_0)$.
+
+An uncorrelated random walk, or a Markov process for a sufficiently large $t$, would result in
+\[F(t) \sim t^\alpha, \]
+with $\alpha = 1/2$, due to the Central Limit Theorem \cite{Viswanathan_1996}.
+The mean square displacement, when plotted on a log-log plot against time, demonstrated a power law relationship with $\alpha = 0.84 \pm 0.2 \neq 1/2$, implying that long-range correlations do, in fact, exist in the wandering albatross data.
+By plotting the sum of the power spectra against the time period used on a linear plot, and against the frequency on a log-log plot, they were able to further confirm the existence of long-range correlations as well as scale invariance.
+To determine the origin of the scale invariance, the authors plotted the distribution of flight-time intervals on a log-log plot, and found that the data approximately fitted a power-law distribution, with a slope of $\mu \approx 2$. 
+
+The authors also used numerical simulations to determine the mean square displacement fluctuations that would be observed under a L\'{e}vy flight model in which the probability density for a flight time, $t$, is given by
+\[p(t) \sim (t + 1)^{-\mu} ,\]
+where the `$+1$' is introduced to account for the bird spending exactly one unit of time each time it lands.
+Fixing $\mu = 2$ in this model, based on the observed slope from the flight-time data of wandering albatrosses, the mean square displacement was found via numerical simulations.
+The simulation of this model yielded long-range correlations with $\alpha = 0.8 \pm 0.05$, which was consistent with the long-range correlation found from the data. 
+
+The reasons for the landing points of wandering albatrosses being spatially scale-invariant was speculated on by Viswanathan \etal \cite{Viswanathan_1996}, with one possible reason being that the distribution of food is also scale invariant.
+Another possible explanation is related to the lifetime distribution of the thermal columns that birds use to produce lift.
+A potential advantage may also be found by considering foragers that operate as a flock, rather than an individual.
+An individual L\'{e}vy walker visits $t$ new sites in the time that an individual Brownian walker visits $t/\ln t$ sites, whereas a flock or swarm comprised of $N$ L\'{e}vy walkers finds $Nt$ sites, while a swarm of Brownian walkers visit $t \ln(N/\ln t)$, making the improved efficiency of the L\'{e}vy flight pattern considerable when dealing with large flocks.
+Since evidence of L\'{e}vy flights was found for albatrosses, the authors suggest further work should be done examining other animals for L\'{e}vy flight patterns.
+
+Using the same methods as previous papers \cite{Cole_1995,Viswanathan_1996}, Viswanathan \etal \cite{Viswanathan_1999} investigated the foraging behaviour of bees, wandering albatrosses, both fenced and unfenced deer, and amoeba.  Using log-log plots and line of best fit, the flight-length distribution was found to fit a power-law distribution with $\mu \approx 2$, which matched the theoretical optimal strategy that they found.
+The amoeba data was found to fit a power-law with $2 \leq \mu \leq 2.5$, which also corresponds to a L\'{e}vy walk.
+
+Recent reanalysis of the empirical evidence has contradicted some of these conclusion. In particular, Edwards \etal \cite{Edwards_2011} devised a \ac{MLE} method to determine more rigorously whether movement data fits a particular distribution. Using this, they revisited many of the original animals that were investigated using higher resolution datasets and found that most did not undergo L\'{e}vy flights. Towards the end of the literature review we discuss the more recent statistical methods, the reanalyses of the empirical results, and some further problems with data analysis in the field of animal foraging, in further detail.
+
+\subsubsection{Basic theoretical models for animal foraging}
+
+Following the empirical evidence of L\'{e}vy flights, Viswanathan \etal \cite{Viswanathan_1999} investigated what search strategy provides a theoretical optimal for a simplified model.
+Their model was two-dimensional and they looked at both \emph{destructive} and \emph{non-destructive foraging}.
+The \emph{search efficiency} was defined to be
+\begin{equation*}
+\eta = \frac{1}{\E{\ell}N},
+\end{equation*}
+where $\E{\ell}$ is the mean flight distance, and $N$ is the mean number of steps taken to find food.
+The step lengths taken by foragers were drawn from a power-law distribution.
+By assuming the \emph{mean free path} between successive targets, which we denote as $\lambda$, are all equal, and denoting the forager's \emph{radius of vision} as $r_v$, the mean flight distance was expressed as 
+\begin{equation*}
+\E{\ell} = \frac{\int_{r_v}^{\lambda}\ell^{1-\mu}d\ell+ \lambda \int_{\lambda}^{\infty}\ell^{-\mu}d\ell}{\int_{r_v}^\infty \ell^{-\mu}d\ell},
+\end{equation*}
+which can be solved exactly.
+The mean number of steps taken to find a target is denoted either $N_d$ or $N_n$, for destructive and non-destructive foraging, respectively. 
+
+To solve for $N_d$, the authors defined $\mu-1$ as the fractal dimension of the sites, and then used an existing result \cite{Geisel_1985} to determine that the mean number of steps until a target is found to scale as $N_d \approx (\lambda/r_v)^{\mu-1}$, for $1 \leq \mu \leq 3$, which is valid for the destructive case.
+If $\mu \geq 3$, which corresponds to Brownian motion, then the mean steps scale as $N_d \approx (\lambda/r_v)^2$.
+To solve for non-destructive foraging, they showed that $N_n \approx N_d^{1/2}$ using a one-dimensional Brownian walker.
+More specifically, a Brownian walker at the middle of an interval has $N_d = \lambda^2/(2D)$, where $D$ is the diffusion constant, and a Brownian walker at some small distance, $r_0$, from the edge of an interval has $N_n= (\lambda-r_0)r_0/(2D)$.
+This implies that $N_n \approx N_d^{1/2}$, and the authors assumed that this relation remains true even for $\mu < 3$, and thus arrived at $N_n \approx (\lambda/r_v)^{(\mu-1)/2}$ for $1 \leq \mu \leq 3$.
+
+Then, with their approximate expressions for the efficiency, Viswanathan \etal \cite{Viswanathan_1999} determined the most efficient strategy for a range of different scenarios.
+When target sites are plentiful, $\lambda \leq r_v$ and so $N_d \approx N_{n} \approx 1$, meaning the efficiency is independent of search strategy.
+For sparse targets, the efficiency for destructive foraging was found to asymptotically increase as $\mu \to 1$, corresponding to ballistic motion.
+For non-destructive foraging when targets are sparse, an optimum was shown to exist at $\mu = 2 - \delta$, where $\delta \approx [\ln(\lambda/r_v)]^{-2}$, which corresponds to a L\'{e}vy flight.
+
+Viswanathan \etal \cite{Viswanathan_1999} verified the validity of their conclusions by performing numerical simulations, which were found to match the analytic approximations they had derived.
+Further, the fact that the optimal strategy for non-destructive foraging matched previous empirical results \cite{Cole_1995,Viswanathan_1996} strengthened the validity of the model.
+Thus, their model seemed to be simple enough to obtain some analytic results, while still being complex enough to consider various different scenarios and maintain realism.
+This paper became one of the foundations of stochastic animal foraging theory, with many papers building upon this model.
+
+Bartumeus \etal \cite{Bartumeus_2013} considered a one-dimensional foraging model, which they showed can be reduced to a single interval with absorbing boundaries at either end representing food targets. They considered a forager doing a random walk with an arbitrary step-length distribution, and found an exact expression for the expected total length until food is found, and hence the foraging efficiency. Some of the results of this paper already existed \cite{Buldyrev_2001_avetime,Buldyrev_2001_prop}, although not in the context of animal foraging. They confirmed the optimal efficiency of a power-law random walk occurs at $\mu=2$, representing a L\'{e}vy walk.
+
+\subsubsection{Further empirical investigation and methodology}
+
+The evidence of L\'{e}vy flights in animal foraging data \cite{Cole_1995,Viswanathan_1996,Viswanathan_1999} sparked an interest in investigating the step-length distribution of many different species of animals, with many papers following these first three.
+Most species investigated were found to have some evidence of L\'{e}vy flight movement paths (e.g. \cite{Marell_2002,Ayala_Orozco_2004,Reynolds_2007_moths,Reynolds_2007_bees,Sims_2008}), although this was not the case for every species (e.g. \cite{Austin_2004}). 
+
+Much of the investigation of animal movement data used the same methods as the original L\'{e}vy flight papers of Cole \cite{Cole_1995}, and Viswanathan \etal \cite{Viswanathan_1996}.
+The most commonly used technique was plotting the distribution of step-lengths on a log-log plot to determine the parameter of the power-law distribution.
+Mårell \etal \cite{Marell_2002} investigated semidomesticated female reindeer, for which the line of best fit on a log-log plot of the step-length distribution had a slope of $\mu=1.8$ or $\mu=2$ depending on the time-scale.
+Ayala-Orozco \etal \cite{Ayala_Orozco_2004} studied the movement patterns of free-ranging spider monkeys and found that the fitted power-law distribution has parameter $\mu=2.18$.
+Austin \etal \cite{Austin_2004} found that only 15.3\% of grey seals had movement data that fit a negative power law distribution based upon regression lines on a log-log plot, and suggested that the lack of evidence for L\'{e}vy flight may be indicative of non-randomly distributed food items.
+Sims \etal \cite{Sims_2008} used a log-log plot to determine the power-law parameters for penguins ($\mu=1.7$, $r^2 = 0.91$), sharks ($\mu=2.4$, $r^2=0.90$), as well as sea turtles and various bony fish, which had parameters between that of penguins and sharks.
+Reynolds \etal \cite{Reynolds_2009_fractional} investigated Drosophila again, and found that a power-law distribution with a parameter of $\mu \approx 2$ provided the best fit.
+Reynolds \etal \cite{Reynolds_2007_moths} found the frequency distribution of the appetitive Agrotis segetum moths to fit a power-law distribution with $\mu=1.5$.
+This value of $\mu$ is consistent with the optimal parameter for a biased L\'{e}vy flight, which has $1 < \mu \leq 2$.
+Reynolds \etal \cite{Reynolds_2007_moths} reasoned that a biased strategy occurred due to the way the experiment was conducted, with the detection of pheromones depending on whether or not the target was upwind or downwind.
+
+Some other methods were also used in investigating animal movement data.
+Reynolds \etal \cite{Reynolds_2007_bees} considered the mean square displacement of the flight lengths of honey bees, $F(t)$,  finding $F(t) \propto t^\alpha$, where $\alpha=0.85 \neq 0.5$, which is indicative of long-term power-law correlation.
+This scale-free behaviour is consistent with a L\'{e}vy walk with $\mu \approx 2$, and the scaling exponent found can be reproduced with a truncated L\'{e}vy flight with $\mu = 2$.
+Sims \etal \cite{Sims_2008} also plotted the mean square displacement of the displacement of various sea creatures, and found values of $\alpha$ between $0.80$ and $1.24$, which implies a long-term correlation and indicates scale-invariance in the movement pattern.
+Ayala-Orozco \etal \cite{Ayala_Orozco_2004} also considered an exponential distribution ($r^2=0.79$) for the step-length distribution, although the power-law ($r^2=0.89$) was shown to provide a better fit.
+Mårell \etal \cite{Marell_2002} found the fractal dimension in reindeer movement lengths to be between $1.0$ and $1.5$, with the time-scale having no effect.
+The fractal dimension of Brownian motion is $2$, and thus they concluded that Brownian motion was not a good fit for reindeer movement, which implies that a L\'{e}vy flight may be a better fit.
+
+Evidence was also found for heavy-tailed distributions in various other aspects of animal movement, beyond just the distribution of step-lengths.
+Ayala-Orozco \etal \cite{Ayala_Orozco_2004} found evidence of a heavy-tailed distribution of waiting times in the movement of spider monkeys, with a power-law distribution ($\mu = 1.7$, $r^2 = 0.86$) providing the best fit.
+Sims \etal \cite{Sims_2008} examined horizontal krill density in the current of a water column passing an echosounder.
+The frequency distribution of changes in krill density was plotted on a log-log plot, and found to fit a power-law distribution with $\mu=1.7$.
+Since krill is consumed by some of the predators from the study, this finding suggested that the existence of L\'{e}vy flight behaviour in predator movement may be in response to prey distribution. 
+
+Sims \etal \cite{Sims_2008} suggested two possible explanations for the existence of L\'{e}vy flight behaviour in animal foraging movement: animal search patterns are adapted to stochastically optimise their search for food and are essentially `blind' at the spatio-temporal scale that they search at, or search patterns that are apparently optimal simply arise as a function of the distribution of the prey.
+The authors provided further support for the latter explanation, by showing that L\'{e}vy walk search strategies have advantages in landscapes with fractal prey distributions compared to other prey distributions.
+Through numerical simulations of vertical diving movement, the encounter rate of both L\'{e}vy walks and random searches in both L\'{e}vy and fractal prey fields are tested, finding that L\'{e}vy walks in L\'{e}vy environments had encounter rates 14\% higher than in random environments.
+
+\subsection{Extensions to the basic foraging model}
+
+\subsubsection{Foraging for moving targets}
+
+Bartumeus \etal \cite{Bartumeus_2002} considered the case of foraging for moving targets, which can be thought of as a \emph{predator} searching for moving \emph{prey}.
+The authors performed a simulation study of a single forager and a single moving target in one-dimension on an interval of length $L$, with periodic boundary conditions, this domain is equivalent to a circle with perimeter $L$.
+Varying the size of the system, $L$, effectively varies the density of food targets.
+Both the searcher and the target move with a constant velocity, and each step $j$ that they take is in a random direction and of length $\ell_j$, where $\ell_j$ is chosen from a power-law distribution.
+Efficiency was defined to be the encounter rate per unit distance travelled by the searcher.
+The ratio of \emph{searcher velocity} to \emph{target velocity} was denoted $v$, and the ratio of size --- usually representing either physical size or detection radius --- between the searcher and the target was $r$.
+Both the target and the searcher adopt either Brownian ($\mu=3$) or L\'{e}vy ($\mu=2$) searches.
+The simulation was repeated, and after an encounter the target is destroyed and a new one created in a random location.
+As the system size gets larger, the relative efficiency of a L\'{e}vy walk search compared to a Brownian search increases.
+When the targets move according to a Brownian motion, a L\'{e}vy walk search is the most efficient, except for the extreme case of very large (approximately $r\geq 10$) and fast moving targets (approximately $v \geq 10$).
+However, when the food targets follow a L\'{e}vy walk, a Brownian search often outperforms a L\'{e}vy search; for example, when target density is high ($L = 25$), Brownian search outperforms L\'{e}vy search when $r>1$ and $v>1$.
+The authors found that with Brownian targets, size ratio and velocity ratio are both equally important, but with L\'{e}vy targets, velocity ratio is more important than size ratio.
+
+James \etal \cite{James_2008} continued investigating this same model of moving searcher and target, and confirmed the results that a L\'{e}vy search outperforms a Brownian search for Brownian targets, with its relative advantage greater when $v$ is smaller.
+However, the authors did not restrict themselves to just $\mu=3$ and $\mu=2$ for the searcher as Bartumeus \etal \cite{Bartumeus_2002} did, but instead investigated an entire spectrum of values from $\mu=1$ to $\mu=3$, with the food target following either a ballistic path ($\mu\to 1$), L\'{e}vy walk ($\mu=2$), or Brownian motion ($\mu=3$).
+They found that a ballistic search actually outperforms both a L\'{e}vy search and a Brownian search in all but one case --- the unrealistic case when the searcher and target have identical speeds ($v=1$) and travel in the same direction, never encountering one another.
+The authors also derived an analytic expression for the mean efficiency of a ballistic search, $\eta$, based on a geometric approach
+\begin{equation*}
+\eta = \begin{cases}
+2(1-v^2)/L \quad \text{for } v \leq 1,\\
+[2(v^2 - 1)]/(Lv) \quad \text{for }v \geq 1.
+\end{cases}
+\end{equation*}
+James \etal \cite{James_2008} also extended the model by considering many moving targets, each moving independently of each other, which they argued is a more accurate approximation of a higher-dimensional setting.
+They assumed the searcher begins at $0$, and considered the case of evenly-spaced targets at $(2n-1)L/2$, $n\in \mathbb{Z}$, as well as the case with uniformly distributed targets, both cases having the same target density.
+A predator using a ballistic search was once again shown to be more efficient than either a Brownian or L\'{e}vy search.
+
+Faustino \etal \cite{Faustino_2007} considered the same model as James \etal \cite{James_2008}, although only the case of $v=1$, and rather than using a pure power-law distribution, they instead used a truncated power-law distribution.
+The optimal search strategy was found to be when $\mu=1$, which does not break down in this case as it did in James \etal \cite{James_2008}, since it is not actually ballistic motion.
+James \etal \cite{James_2008} declared that the efficiency of this truncated power-law search with $\mu=1$ is the same as the ballistic search when $v \geq 1$, and is outperformed by the ballistic search when $v<1$.
+James \etal \cite{James_2008} concluded that the superior efficiency of the ballistic search against all others, and of the L\'{e}vy search over the Brownian search, is due to the lack of backtracking allowing more ground to be covered by the searcher.
+James \etal \cite{James_2008} also pointed out that the work of Bartumeus \etal \cite{Bartumeus_2002} is somewhat flawed: it considered only the size ratio $r_t/r_p$ and not the absolute values, although the sum of their sizes, $r_t + r_p$, relative to the system size, $L$, is actually what determines the target density. Keeping $r_t+r_p$ fixed and varying the ratio $r_t/r_p$, Faustino \etal \cite{Faustino_2007} showed that the efficiency does not change.
+
+Bartumeus \etal \cite{Bartumeus_2008_super} performed another simulation study, this time considering a range of $\mu$ between $1$ and $3$, as well as varying target density, target size, target cruising velocity, and both destructive and non-destructive searches, on $1$D, $2$D, and $3$D search spaces.
+Their results confirmed the results of James \etal \cite{James_2008} for the destructive case, and found that $\mu \approx 2$ is most efficient for the non-destructive case, with the exact value depending on the system's parameters.
+They noted that although increasing the dimension reduces the relative efficiency of one strategy over another, it does not change what the optimal strategy is.
+When targets travel slower than the searcher, the encounter rates are affected only by the search strategy of the searcher, and when searchers travel slower, the encounter rates are affected only by the movement strategy of the target.
+That is, the encounter rate depended only on the movement strategy of the faster moving organism.
+When both searcher and target move at similar speeds, the most efficient search strategy for the searcher was to use a L\'{e}vy search with parameter as far away from the parameter of the targets L\'{e}vy movement as possible (e.g. $\mu=3$ if the target is moving according to $\mu \to 1$, and $\mu \to 1$ if the target is moving according to $\mu=3$).
+
+\subsubsection{Food targets with a revisitability delay}
+
+Raposo \etal \cite{Raposo_2003} studied the role of a \emph{delay time} --- or \emph{revisitability delay} --- which was denoted $\tau$.
+After an animal finds a food target, the same target cannot be revisited until $\tau$ time has elapsed since originally visiting it.
+A revisitability delay essentially provides a continuum between non-destructive ($\tau = 0$) and destructive foraging ($\tau = \infty$).
+Raposo \etal began with the model outlined by Viswanathan \etal \cite{Viswanathan_1999} and extended it by adding a delay time to the targets.
+To determine the optimal strategy, the authors used a result from the one-dimensional case found by Buldyrev \etal \cite{Buldyrev_2001_prop}, that if a forager begins at a point $x=z\lambda$ in the interval $[0,\lambda]$ with $0<z<1$ and $\lambda/\lmin \to \infty$, the optimal parameter for a power-law strategy is
+\begin{equation*}
+\mu_{\text{opt}} = 2 + \frac{2}{\log z} + o\left(\frac{1}{\log z}\right).
+\end{equation*}
+Raposo \etal \cite{Raposo_2003} related the distance $z\lambda$ to the forager's velocity and the delay time by
+\begin{equation*}
+z = \frac{v \tau}{\lambda}.
+\end{equation*}
+This is based on the assumption that the forager moves at a constant velocity $v$ away from the target during the delay time, and then begins its search again once the delay time expires, which will be at point $z \lambda$.
+Using this, the authors showed that the case of $\tau \to 0$ implies that $z \to 0$ and $\log z \to -\infty$ and hence $\mu_{\text{opt}} = 2$.
+Similarly, when $z > 1/e^2$ --- which occurs when $\tau > \lambda/(v e^2)$ --- the optimal strategy is $\mu < 1$, corresponding to straight line motion with constant velocity.
+Although the optimal efficiency is not known exactly for higher dimensions, Raposo \etal \cite{Raposo_2003} argued that the results of the one-dimensional case have validity since in $d$ dimensions the forager moves through a one-dimensional corridor of cross section proportional to $r_v^{d-1}$, and they confirmed this for the two-dimensional case using simulations.
+The authors concluded that the most efficient strategy is strongly dependent on the delay time of the targets as long as $\lmin \geq r_v$, where the efficiency is defined as the number of targets found per distance travelled, with $1 < \mu_{\text{opt}}(\tau) \leq 2$, based on the two limiting cases of destructive and non-destructive foraging. 
+	
+Raposo \etal \cite{Raposo_2003} also considered a more general cost function, $f(\E{L})$, which is a function of the expected distance to find a single target.
+This definition of efficiency can take into account various phenomena that make the model more realistic, such as energy gain due to calories and nutrients in the targets.
+The optimal values of $\mu$ for a L\'{e}vy walk do not change when using this more general notion of efficiency, although depending on the cost function the values that $\mu$ can take may be limited. 
+
+Santos \etal \cite{Santos_2004} further investigated a delay time, and extended the results of Raposo \etal \cite{Raposo_2003} by effectively interpolating between the two known results, which are the limiting cases of destructive ($\tau \to \infty$) and non-destructive foraging ($\tau = 0$).
+As found originally by Viswanathan \etal \cite{Viswanathan_1999}, the expected number of steps to find a food target scales as $N_s \sim \lambda^{(\mu -1)/2}$ for a search beginning at $x_0=r_v$ (non-destructive), and $N_s \sim \lambda^{\mu-1}$ for $x_0=\lambda/2$ (destructive).
+Based on this, Santos \etal \cite{Santos_2004} determined the more general form for the mean number of flights,
+\begin{equation*}
+N_s \sim \lambda^{(\mu-1)/\Gamma},
+\end{equation*}
+where $\Gamma=2$ and $\Gamma=1$ are the two limiting cases for non-destructive and destructive foraging, respectively.
+The authors then considered $\Gamma(\tau)$, as a monotonically decreasing function with $\Gamma \to 2$ when $\tau \to 0$ and $\Gamma \to 1$ when $\tau \to \infty$.
+Using this function, Santos \etal \cite{Santos_2004} arrived at an expression for the efficiency depending only on the value of $\Gamma$ as well as the ratio $\lambda /r_v$.
+The authors then plotted the efficiency of a L\'{e}vy search for a range of different values of $\tau$, showing the crossover between the two different limiting cases.
+Santos \etal \cite{Santos_2004} also considered the effect of a more general cost function which takes into account the forager's energy, and concluded that optimal parameters will not be affected by this different notion of efficiency, matching the conclusions of Raposo \etal \cite{Raposo_2003}.
+
+\subsubsection{Two-dimensional and three-dimensional foraging}
+
+Santos \etal \cite{Santos_2005} considered a two-dimensional search on a lattice, with two different types of lattice topology: a \emph{square lattice}, with $4$ possible directions from each node, and a \emph{triangular lattice}, with $6$ possible directions from each node.
+Targets were assumed to be distributed homogeneously among the nodes of the lattice, and both the non-destructive and destructive cases were considered.
+A forager would choose a uniformly random direction and a step-length from a power-law distribution.
+If a target is within a distance $r_v$ of a forager, the forager may move directly to it if there is a straight-line path towards it, meaning zigzag paths were restricted.
+Using this simplified model, the authors were able to obtain some analytic results.
+A L\'{e}vy walk with $\mu \approx 2$ was only optimal for low target densities, with a ballistic path being the optimal strategy for higher target densities.
+
+Santos \etal \cite{Santos_2008} \etal built upon the previous two-dimensional lattice model \cite{Santos_2005}, by introducing \emph{defects} that were randomly scattered throughout the lattice.
+Under their model, foragers would travel in a straight line until they came into contact with a defect, after which they would choose a new direction and distance. One way of thinking about defects is as food patches that are found to be empty upon arriving at them.
+The optimal strategy was found to heavily depend on the density of targets and defects, as well as the boundary conditions employed.
+For $\mu >2$, the average step length is small and so truncation does not happen very often; consequently, the density of food patches and defects matter somewhat less, and the boundary conditions have almost no effect on the optimal strategy.
+Raposo \etal \cite{Raposo_2009} also considered a very similar model to Santos \etal \cite{Santos_2008}, involving a lattice with defects.
+Using both analytic approximations and simulations they came to similar conclusions as Santos \etal \cite{Santos_2008}, finding that as the presence of defects increases, the relative advantage of one strategy over any other decreases.
+
+\subsection{Composite search strategies for improved efficiency}
+
+\subsubsection{Foraging strategies with a giving-up time}
+
+Benhamou \cite{Benhamou_2007} considered \emph{composite Brownian walk} strategies as alternatives to L\'{e}vy walk strategies when searching in a \emph{patchy environment}. 
+A composite Brownian walk is a mixture of two random walks, both with exponentially-distributed step sizes. 
+A patchy environment was here defined to have uniformly distributed patches of food, and within these patches the density of food is much higher than the density of food outside of the patches.
+The forager considered by Benhamou began with an extensive search, in which large steps were drawn from an exponential distribution, and switched to the intensive search once a food patch was reached, with step-lengths also drawn from an exponential distribution, with different parameters resulting in a smaller mean.
+After some time, referred to as the giving-up time, had elapsed, the forager would switch back into the extensive movement mode.
+In a patchy food environment with destructive targets, the forager begins its next search in the vicinity of a target since multiple targets are clumped together, and so this scenario is equivalent to the non-destructive scenario of Viswanathan \etal \cite{Viswanathan_1999}.
+Through simulations, Benhamou \cite{Benhamou_2007} showed that a composite Brownian walk appeared to be more efficient than a L\'{e}vy walk for finding food in a patchy environment.
+
+Plank and James \cite{Plank_2008} derived some analytic results for a similar model in one dimension, in which a forager follows a Brownian motion for its intensive search, before giving-up and undergoing ballistic motion for its extensive search.
+They reasoned that, due to the Central Limit Theorem, the discrete model of Benhamou \cite{Benhamou_2007} will converge to their model after a large number of steps, as long as the variance of the step-length distribution is finite.
+In deriving an expression for the density of the total distance travelled to find food, they used an existing result for the density of Brownian motion with an absorbing barrier at $x=0$, from Grimmett and Stirzaker \cite{Grimmett_2001}. 
+This also means that the results are only valid for strategies which have Brownian motion as the intensive search strategy, but not a L\'{e}vy walk, for example.
+With their model, Plank and James \cite{Plank_2008} derived an analytic expression for the optimal giving-up time, as well as showed that the composite Brownian walk strategy outperforms a L\'{e}vy walk strategy, in agreement with the results of Benhamou \cite{Benhamou_2007}.
+
+\subsubsection{Adaptive L\'{e}vy walks as a more general giving-up time strategy}
+
+Reynolds \cite{Reynolds_2008_comment} explained that the composite Brownian walk search of Benhamou \cite{Benhamou_2007} can actually be viewed as a special case of an \emph{adaptive L\'{e}vy walk search}. 
+An adaptive L\'{e}vy walk involves switching between a L\'{e}vy walk with $\mu \to 1$ for the extensive search, and a L\'{e}vy walk with $\mu=3$ for the intensive search.
+Then, Reynolds argued, that when considering the CBW as an adaptive L\'{e}vy walk the results of Benhamou \cite{Benhamou_2007} follow directly from the L\'{e}vy walk search theory of Viswanathan \etal \cite{Viswanathan_1999}, since a L\'{e}vy walk with $\mu \to 1$ was optimal for sparse targets, and $\mu=3$ for densely distributed targets.
+Benhamou \cite{Benhamou_2008} replied to Reynolds \cite{Reynolds_2008_comment}, pointing out that the composite Brownian walk could not be thought of as an adaptive L\'{e}vy flight for two reasons: the inverse power-law has infinite variance when $1 < \mu < 3$ and so $\mu =3$ does not correspond to a L\'{e}vy flight, and when $\mu \to 1$ a L\'{e}vy flight tends to a straight line of infinite length and so must be truncated, effectively making the variance finite. 
+Benhamou's criticism is mostly valid, since to be Brownian motion (in the scaling limit), a strategy must have a step-length distribution with finite variance, whereas a L\'{e}vy walk uses a power-law distribution with infinite variance, by definition.
+However, this disagreement between Reynolds and Benhamou is ultimately over little more than semantics, since if although a power-law with $\mu =3$ is technically not a L\'{e}vy walk, there is no mathematical reason as to why the step-length distribution cannot have $\mu=3$. For example, if the adaptive L\'{e}vy walk search model was instead referred to as an adaptive power-law search model, since the power-law can produce both a L\'{e}vy walk and a Brownian motion, then the conclusions of Reynolds \cite{Reynolds_2008_comment} would still be true.
+
+Reynolds \cite{Reynolds_2009_adaptive} then considered the adaptive L\'{e}vy walk model but allowed for any value of $\mu$ during the extensive phase, which reduces to the CBW model of Benhamou \cite{Benhamou_2007} when $\mu \to 1$.
+This time it was used to investigate non-destructive foraging ($x_0=r_v$), which as previously shown \cite{Reynolds_2008_comment} is equivalent to foraging in a patchy environment.
+It was determined that the optimal extensive parameter was between $\mu=1$ and $\mu=2$, with a higher food target density moving the optimal closer to $\mu=2$.
+James \etal \cite{James_2011} noted that Reynolds \cite{Reynolds_2009_adaptive} only considered a fixed giving-up time, whereas Plank and James \cite{Plank_2008} optimised over all giving-up times.
+
+Nolting \cite{Nolting_2013} investigated composite strategies such as giving-up time strategies, as well as a new type of strategy that a forager may use, which they called the \emph{optimal zone forager}.
+As with the giving-up time strategy, the optimal zone forager switches between an intensive and extensive search, although this time depending on its current location.
+Thus, the forager must have \emph{a priori} knowledge of where the food targets are located, although it cannot use this knowledge to move directly to a resource, but rather it can only change modes.
+For a strategy that uses a Brownian motion and ballistic motion for its intensive and extensive search, Nolting reasoned that the optimal zone forager is ideal.
+
+\subsubsection{Searching for difficult-to-detect targets}
+
+A one-dimensional composite model was also considered by Bénichou \etal \cite{Benichou_2005}, in which a forager switches between an intensive phase, also known as the \emph{searching phase}, and \emph{extensive phase}, also known as the \emph{relocation phase}.
+In this model, the forager was incapable of detecting targets during the relocation phase, and so the model was referred to as searching for hidden targets. 
+The time spent in each phase was exponentially distributed, and the forager could switch back-and-forth between phases an unlimited number of times.
+As with many of the other composite strategies (e.g. \cite{Plank_2008,Benhamou_2007}), the intensive phase consists of Brownian motion, and the extensive phase is ballistic motion which is always in the same direction.
+This persistence in the direction of the extensive search was referred to as \emph{orientational memory}, and was also addressed by later papers.
+A uniform density of patches is assumed, and so the problem is reduced to finding patches in a single interval, as done in other papers (e.g. \cite{Bartumeus_2013}).
+The authors considered a forager that begins at the middle of an interval, which corresponds to destructive foraging.
+Using an analytic argument, they found that the optimal search strategy under their model occurs when the average duration of the searching phase, denoted $f_1$, is proportional to the average duration in the relocation phase, denoted $f_2$, by either $f_1 \propto f_2^{3/5}$ or $f_1 \propto f_2^{2/3}$ depending on the frequency of the switching.
+
+Bénichou \etal \cite{Benichou_2006_intermittent} considered the effect of how difficult a target is to detect, and whether this changed the optimal search strategy.
+Two types of targets were considered, those that are easy to detect, and those that are difficult to detect, referred to as \emph{hidden}.
+A difficult to detect target requires a forager to pass through the area multiple times before it is finally located, whereas an easily detectable target emits a strong enough stimulus to allow a forager walking past to detect it immediately, as long as it is moving slowly enough.
+Composite strategies were again considered, with exponentially distributed time between intensive Brownian and extensive ballistic search modes.
+For the case of easily detectable targets, it was shown that staying in the active search phase is optimal, as opposed to any composite strategy.
+For hidden targets, the optimal strategy was shown to be a composite strategy where the time spent in each phase is as short as possible, which matches the findings of Bénichou \etal \cite{Benichou_2005}.
+After removing the forager's orientational memory, the optimal search strategy was found to differ.
+With orientational memory, the efficiency scales asymptotically with the mean time spent in each state, whereas without orientational memory the optimal efficiency occurs at finite values for the mean times in each state, which depends on the target density.
+The efficiency of searching for hidden targets with orientational memory was found to always be greater than that of searching without orientational memory.
+
+Lomholt \etal \cite{Lomholt_2008} generalised the model of B\'{e}nichou \cite{Benichou_2006_intermittent} by allowing the time spent in the extensive phase to be drawn from either an exponential or L\'{e}vy distribution.
+It was found that strategies with L\'{e}vy distributed time spent in the extensive phase outperform the previously investigated strategies with exponentially distributed time in each phase.
+Switching between a Brownian motion in the intensive phase and a L\'{e}vy walk in the extensive phase was shown to offer the most efficiency, as well as also being less sensitive to changes in the target density when compared to other strategies.
+Of course, these conclusions relied on the forager not being able to detect food during its extensive phase, as discussed by B\'{e}nichou \etal \cite{Benichou_2006_intermittent}.
+
+Bénichou \etal \cite{Benichou_2006} extended the hidden targets destructive foraging model \cite{Benichou_2005} to two dimensions.
+They again considered composite strategies, with exponentially distributed time between diffusive searching and ballistic motion.
+Taking an approximate analytic approach, they determined that composite two-state strategies optimise the search time required to find a target, as opposed to one-state strategies such as L\'{e}vy flights.
+
+Reynolds \cite{Reynolds_2006} considered the original model of Viswanathan \etal \cite{Viswanathan_1999}, but allowed food to be detected only during a step of length $\ell < \ell_0$, where $\ell_0$ is some fixed threshold.
+The optimal parameter for a power-law search was found to be $\mu \approx 2$ for both non-destructive and destructive targets.
+If $\ell_0$ is the threshold between a step being considered either intensive or extensive, then Reynolds showed that there is a power-law distributed amount of time spent in each phase.
+
+\subsection{Statistical methods for analysing animal movement data}
+
+As discussed above, many early papers \cite{Cole_1995,Viswanathan_1996,Viswanathan_1999,Marell_2002,Ayala_Orozco_2004,Sims_2008,Reynolds_2009_fractional,Reynolds_2007_moths,Reynolds_2007_bees} found empirical evidence of L\'{e}vy flights in animal movement data.
+Most of these \cite{Cole_1995,Viswanathan_1996,Viswanathan_1999,Ayala_Orozco_2004,Sims_2008,Reynolds_2007_drosophila,Reynolds_2007_moths} analysed the movement data by plotting the distribution of step-lengths on a log-log plot, and some \cite{Reynolds_2007_bees,Sims_2008,Ayala_Orozco_2004,Marell_2002} also considered the mean square displacement of the flight lengths.
+However, more recent reanalysis has put these methods into question.
+
+\subsubsection{The effect of subsampled data on the apparent step-length distribution}
+
+Benhamou \cite{Benhamou_2007} questioned the validity of using subsampled data to analyse animal movement.
+Most animal movement data sets represent a subsample of the animal's movement, since the time between recordings of successive locations is usually significantly longer than time-scale at which an animal moves.
+Reynolds \cite{Reynolds_2008_comment} addressed this issue by simulating true L\'{e}vy walk searches with $\mu=2$ and plotting the distribution of subsampled movement lengths, which was still found to fit a log-log plot, though now with $\mu = 1.6$.
+Reynolds suggested that subsampling would result in an effective value of $\mu$ less than the true value.
+
+However, Plank and Codling \cite{Plank_2009} found that the sampling rate at which movement data is collected can affect the apparent properties of the movement path, and can even cause misidentification.
+Using simulations, they show that it is possible to misidentify a composite correlated random walk which switches between two different phases, as a L\'{e}vy walk, even when using appropriate statistical procedures such as maximum likelihood methods that were previously outlined \cite{Edwards_2007,Plank_2008,Edwards_2008}.
+Plank and Codling \cite{Plank_2009} also showed that when a L\'{e}vy walk is subsampled, it can be misidentified as an exponential distribution, with a larger $\mu$ making an apparent exponential more likely.
+The point of greatest uncertainty between an exponential and power-law distribution occurs at $\mu \approx 2$.
+This conclusion contradicts the claim of Reynolds \cite{Reynolds_2008_comment}, who had not compared the goodness-of-fit with that of another distribution.
+
+To avoid the issues with using data that is a subsample of an animal's true movement path, some papers have instead defined turning points (or reorientation points) which correspond to locations at which a forager changes direction by a significant amount.
+Reynolds \cite{ Reynolds_2007_bees} used both \emph{local} and \emph{non-local} determination of a turning point, and found that the statistical properties of the movement distributions do not change significantly between the two.
+When determining the turning points \emph{locally}, a new point was said to have occurred when three successive recorded positions of the forager involve a change in direction greater than some critical angle, which in this case was \ang{90}.
+\emph{Non-local} determination instead used the cumulative change in angle since the last turning point, with a new point occurring once this was greater than the critical angle.
+Since the bee movement distributions found with each of the two methods were not significantly different to each other, this indicated that most direction changes are abrupt, and the authors found that the direction of flight paths are distributed uniformly.
+Reynolds \cite{Reynolds_2007_moths, Reynolds_2009_bees} also used local turning point determination when investigating the movement of moths and bees again, and found that the choice of critical angle had no significant effect on the results. 
+
+Codling and Plank \cite{Codling_2010}, however, found that whether or not a movement path is identified as having a power-law distribution depends on both the sampling rate and the designation of turning angles.
+They simulate correlated composite random walks and L\'{e}vy walks and find that there is no standard method of turning-point identification that is robust for all cases, with non L\'{e}vy walks often displaying L\'{e}vy-like characteristics.
+
+\subsubsection{Improved identification using MLE methods}
+
+Viswanthan \etal \cite{Viswanathan_2005} proposed a criterion that is necessary, but not sufficient, to establish true superdiffusive behaviour in animal movement data.
+If $\tau$ is the estimated correlation time of a general correlated random walk, then the data must display superdiffusive behaviour on scales larger than $\tau$ for there to be true superdiffusive behaviour.
+
+Edwards \etal \cite{Edwards_2007} revisited the movement pattern of albatrosses, now with a higher resolution dataset than the original study \cite{Viswanathan_1996}.
+They discussed some of the inadequacies of the usual data analysis methods used throughout the animal foraging literature (e.g \cite{Cole_1995,Viswanathan_1996,Viswanathan_1999,Ayala_Orozco_2004}), and outlined a \ac{MLE} method to determine whether movement data fits a power-law distribution.
+They analytically solved the \acp{MLE} for both a power-law distribution and an exponential, and used these to determine the \ac{AIC} and the relative likelihood of each model.
+Using their \ac{MLE} method and the new albatross dataset, they determined that there was no evidence of L\'{e}vy flight behaviour in the movement of albatrosses, but rather they followed a gamma distribution.
+After correcting the original albatross data \cite{Viswanathan_1996}, they also determined that the original conclusions of L\'{e}vy flights being present in the data were spurious.
+Furthermore, they applied their method to the original deer and bumblebee datasets \cite{Viswanathan_1999}, and determined that none exhibited evidence of L\'{e}vy flights.
+
+White \etal \cite{White_2008} compared various methods of fitting data to a distribution, including logarithmic binning and \ac{MLE} methods.
+Power-law datasets were generated using Monte Carlo methods, and then using each method the distribution and parameters were determined, before finally comparing the performance of the methods by considering their bias and variance.
+Logarithmic binning was found to give an incorrect exponent, and adjustments were necessary to obtain the correct slope.
+Further, binning methods in general performed poorly, and White \etal \cite{White_2008} recommended avoiding these whenever possible.
+\ac{MLE} methods were shown to be the best approach, and produced valid confidence intervals for the estimated exponents.
+
+\subsubsection{Further issues with identifying L\'{e}vy walks in foraging data}
+
+Plank and James \cite{Plank_2008} simulated a L\'{e}vy walk and a composite random walk and investigated fitting the movement data to step-length distributions.
+They determined the best-fit parameters and the log-likelihood for each model, and in both cases found an exponential distribution provided a better fit than the power law distribution.
+They conclude that both a L\'{e}vy and a non-L\'{e}vy process can produce a non-L\'{e}vy pattern, which complements the results of Benhamou \cite{Benhamou_2007}, who showed that both a L\'{e}vy and non-L\'{e}vy process can produce a L\'{e}vy pattern.
+
+Following some of the inadequacies found with the early evidence for L\'{e}vy flights in foraging data \cite{Edwards_2007}, Edwards \cite{Edwards_2011} readdressed many of the previous datasets to determine if L\'{e}vy flights really are prevalent in ecology.
+He used the modern \ac{MLE} and \ac{AIC} approach \cite{Edwards_2007} to compare L\'{e}vy flights to other simple models, and examined 17 different datasets from previous studies \cite{Austin_2004,Marell_2002,Atkinson_2002,Brown_2006,Bertrand_2007,Marchal_2007,Bartumeus_2003}.
+The possible distributions were: unbounded power-law (L\'{e}vy flight), bounded power-law (truncated L\'{e}vy flight), unbounded exponential, and bounded exponential.
+Almost all of the original estimates of the parameters were found to lie outside 95\% confidence intervals for the newly calculated parameters.
+Further, the evidence of L\'{e}vy flights was overturned for all 17 datasets.
+The gray seal dataset was found to have come from a bounded power-law distribution, or a truncated L\'{e}vy flight, and the possibility of the hunter-gatherer dataset coming from a bounded power-law distribution also could not be ruled out.
+Three of the 17 datasets were found to fit an unbounded exponential distribution, and the remaining 12 datasets did not match any of the four tested distributions.
+Thus, Edwards concluded that L\'{e}vy flight movement patterns are not as common a phenomena in ecology as once thought.
+
+\subsubsection{Empirical evidence for composite strategies}
+
+There has been empirical evidence of animals using composite (or intermittent) strategies, including honeybees \cite{Tyson_2011}, fish \cite{Hills_2002}, birds \cite{Nolet_2002}, turtles \cite{Tyson_2011}, weasels \cite{Haskell_1997}, slime moulds \cite{Latty_2009}, beetles \cite{Ferran_1994}, and others \cite{Benhamou_1994,Reynolds_2009_adaptive,Morales_2004,Klaassen_2006,Jonsen_2007}.
+
+Further, many animals have been found to switch between an intensive and extensive search based on sensory cues from their environment \cite{Sugimoto_1987,Bell_1990,Strand_1982,Persons_1997,Nevitt_2000,Leick_1985,Hellung-Larsen_1990,Dusenbery_1998,Moore_2004,Doving_1994,Dalby-Ball_2000}.
+For example, some parasites were shown to use chemical cues to decide when to use an intensive search \cite{Sugimoto_1987,Bell_1990,Strand_1982}, and in a similar way Procellariiform seabirds were shown to use dimethyl sulphide to determine when an intensive search should be used \cite{Nevitt_2000}.
+
+Some of the evidence of composite strategies is based on the qualitative behaviour of animals, while there are also papers that examine the step-length distributions of movement data using various quantitative methods, such as \acp{SSM},\cite{Jonsen_2007}, \acp{HMM} \cite{Joo_2013,Patterson_2017}, Bayesian inference \cite{Parton_2017} and deep-learning models \cite{Browning_2017}.
+
+\iffalse
+B\'{e}nichou \etal \cite{Benichou_2011} provided a thorough review of intermittent search strategies, on both the microscopic and macroscopic scale.
+They considered intermittent strategies as a slow search phase with possible detection of food, followed by a fast movement phase with no possibility of food detection.
+\fi
+\end{section}

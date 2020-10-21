@@ -1,0 +1,228 @@
+%!TEX root = ../thesis.tex
+We stated at the end of \cref{sec:1dRW_distance,sec:1dRW_steps,sec:1dMMRW_distance,sec:1dMMRW_steps} that the exact analytic solutions we found for the expected total cost cannot feasibly be solved for any realistic choice of step-length distribution. In this section we outline how we may numerically solve these expressions via a spatial discretisation.
+
+The discretisation of the unmodulated random walk in \cref{sec:1d_discrete:RW} once again can mostly be accredited to Bartumeus \etal \cite{Bartumeus_2013}. However, we also derive a numerical approximation for \cref{eq:1dRW_cost:EV2_neumann}, an expression which avoids having to use properties of the Dirac delta function, and hence is valid for any distribution of starting locations. Bartumeus \etal \cite{Bartumeus_2013} made the claim that the use of the Dirac delta was a crucial step in their derivation, but the existence of our expression --- which has comparable computational efficiency --- shows that this is not true. 
+
+The discretisation of the Markov-modulated random walk builds upon \cref{sec:1d_discrete:RW} in much the same way that \cref{sec:1dMMRW} built upon \cref{sec:1dRW}. We are ultimately able to derive a simple expression for the cost of a Markov-modulated random walk, which amounts to solving a system of equations, which we solve using Matlab in \cref{sec:1d_results}. We also derive an alternative expression which avoids needing to know the initial location of a forager.
+
+It is perhaps possible to argue that we could simply replace the functions and operators in the final analytic expressions with their discretised equivalents, resulting in the same numerical expressions found in this section. We opt, however, to demonstrate the derivation of the numerical expressions in full, to ensure correctness, as well as being able to shed some more light on some of the issues found in the derivation of the analytic expressions, such as in deriving the cost for a single state of a Markov-modulated random walk.
+
+\section{Notation and assumptions\label{sec:1d_discrete:notation}}
+
+The continuous search space $[0,\lambda]$ is replaced with a set of discrete positions at which the forager can be located. The positions are a distance $\Delta x$ apart, and we denote the discretised point corresponding to $x=\lambda$ as $M$. Hence, the possible locations all take the form $j\Delta x$ with $j=0,1,\dots,M$. The discretisation length, $\Delta x$, is assumed to be much smaller than any of the original model parameters ($\lmin,\lmax,r_v,\lambda$).
+
+Then, discrete approximations of the model parameters are obtained with
+\[\lmin = m_0 \Delta x, \quad \lmax = m_m \Delta x, \quad r_v = m_r \Delta x, \quad m_0,m_m,m_r \in \mathbb{Z}. \]
+
+The set of location variables $\{x_0,x_1,\dots,x_{n}\}$, which correspond to steps~$\{0,1,\dots,n-1,n\}$, correspond to steps ending at points $\{i_0,i_1,\dots,i_n\}$, where $x_m = i_m \Delta x$. %Note that points in continuous space are rounded to the discrete point below if they aren't already an integer multiple of $\Delta x$. This problem shrinks as $\Delta x \to 0$.
+
+We use the notation $[\rho_n]_i$, $[h]_i$, and $\E{Q}_{i}$ to represent the functions $\rho_n(x)$ and $h(x)$, $\E{Q(x)}$ respectively, evaluated at the point $x=i \Delta x$. Then, $[\rho_n]$, $[h]$, and $\E{Q}$ are vectors used to denote the functions evaluated at every point in the discretised search space. Similarly, for the Markov-modulated case we use $[\rho_{n,j}]$, $[h_j]$, and $\E{Q_j}$ to denote the vector of discretised functions $\rho_{n,j}(x)$, $h_j(x)$, and $\E{Q_j(x)}$. We break with the convention of using boldface to denote vectors to be consistent with previous work \cite{Bartumeus_2013}, and since we use boldface to differentiate between the unmodulated and Markov-modulated versions of various quantities.
+
+In discrete space, we represent the step-length distribution $p(\ell)d\ell$ using the matrix $A$. In continuous space we had $p(x_{m+1}-x_m)dx_m$, which corresponds to the probability of reaching location $x_{m+1}$ in a step starting from $x_m$, on the $(m+1)$th step. This is a jump of length $\left| x_{m+1} - x_m \right|$ which becomes $\left|i_{m+1} - i_m \right| \Delta x$ in the discretised space, which we denote as $[A]_{i_m,i_{m+1}}$. However, we must also take into account step-lengths that in continuous space are not integer multiples of~$\Delta x$, which we do by integrating over all continuous values that will result in the same discrete value when discretised. Thus, we can find each element of $A$ using
+\begin{equation}
+\label{eq:1d_discrete:A_matrix_integral}
+[A]_{j,k} = \int_{|j-k|\Delta x}^{(|j-k|+1)\Delta x} p(\ell) d\ell, \quad k \neq j.
+\end{equation}
+Due to the symmetry of the jump probabilities, $[A]_{j,k} = [A]_{k,j}$ and hence the matrix $A$ is symmetric. We require that every jump is greater than the minimum jump size, and so $[A]_{j,k} = 0$ for $|j - k| < m_0$. For step-length distributions with a finite $\lmax$, we also require $[A]_{j,k}=0$, for $|j-k| \geq m_m$. Expressions for the matrix $A$ based on \cref{eq:1d_discrete:A_matrix_integral} are found for a variety of step-length distributions in \cref{app:calc}. Similarly, for the Markov-modulated case we define $\Amat$, which is made up of submatrices denoted $A_i$, each representing the step probabilities while $Z$ is in state $i$. Thus, the elements of $A_i$ are found in the same way as matrix $A$, with $p_i(\ell)$ and the corresponding values of $m_0$ and $m_m$.
+
+In the discrete approximation, an integral over the continuous space becomes a sum over the discrete index. However, whether or not the end points are included in the summation is an important question which was not addressed in the continuous model, since the inclusion of endpoints make no difference when integrating. Our integrations over the continuous search space represented all of the possible points at which the forager was still searching for a target, and so the end points should not included, as these are where the forager would be able to detect the food. When the discrete radius of vision is $m_r$, the points from $m_r+1$ to $(M-m_r-1)$ are the locations where food hasn't yet been detected. Thus for an integral over $[r_v,\lambda-r_v]$, the equivalent summations are all from $m_r+1$ to $M-m_r-1$, rather than $m_r$ to $M-m_r$.  Thus, the effective search interval has a length of $(M-m_r-1) - (m_r+1)+1 = M-2m_r-1$, and so the matrix $A$ should have dimensions $(M-2m_r-1)\times(M-2m_r-1)$.
+
+However, we instead define $A$ to be an $(M-1)\times(M-1)$ matrix, by putting an outside layer of zeros --- of width $m_r$ --- on each side. This way, the $(i,j)$th element of $A$ will correspond to the probability of moving from the $i$th point in the search space to $j$th point. Similarly, the vector $[h]$ has a length of $M-2m_r-1$ for its non-zero elements, but we say $[h]$ has length $M-1$, with $m_r$ zeros on each end. Note that although we are only considering points within the search space, the forager may jump from within the search space to outside it, and thus the row sums of $A$ will not necessarily equal $1$. For the Markov-modulated case, the radius of vision may vary across states, so the dimensions of the non-zero elements of each $A_i$ may vary across each state. Each matrix $A_i$ will have the same dimensions as $A$, although the amount that the matrix needs to be padded with zeros will depend on the radius of vision in the corresponding state.
+
+In deriving the analytic expressions for the expected total cost, we used the property of the Dirac delta function that
+\begin{equation*}
+\int_{r_v}^{\lambda-r_v} \delta(x-a)dx = 1,
+\end{equation*}
+which in the discrete approximation becomes
+\begin{equation*}
+\sum_{j=m_r+1}^{M-m_r-1}\delta_{j,i_a} = 1,
+\end{equation*}
+where $\delta_{j,i_a}$ is the Kronecker delta. The point $i_a$ is the discretisation of the initial location $x_0=a$, and so $i_a$ is $a/\Delta x$ rounded to the nearest integer. 
+
+\section{Discretised expressions for a random walk strategy \label{sec:1d_discrete:RW}}
+
+Recall from \cref{sec:1d_discrete:RW} that we were able to write $\rho_n(x_n)$, the density function for the position of the animal at the end of the $n$th step, as an expression involving $\rho_{n-1}(x_{n-1})$, 
+\begin{equation*}
+\rho_n(x_n) = \int_{r_v}^{\lambda-r_v} \rho_{n-1}(x_{n-1}) p(x_n-x_{n-1}) dx_{n-1},
+\end{equation*}
+which applied recursively becomes
+\begin{equation*}
+\rho_n(x_n) = \int_{x_{n-1}=r_v}^{\lambda-r_v} \dots \int_{x_0 = r_v}^{\lambda-r_v} \rho_{0}(x_0) \prod_{i=0}^{n-1} p(x_{i+1}-x_{i}) dx_{i}.
+\end{equation*}
+Replacing the integrals with their equivalent summations, we use this to find an expression for $\rho_n$ in the discrete approximation, which is
+\begin{equation*}
+[\rho_n]_{i_n} = \sum_{i_0=m_r+1}^{M-m_r-1} \cdots \sum_{i_{n-1}=m_r+1}^{M-m_r-1} [A]_{i_{n-1},i_{n}} [A]_{i_{n-2}.i_{n-1}} \dots [A]_{i_1,i_2}[A]_{i_0,i_1} [\rho_0]_{i_0},
+\end{equation*}
+where $[\rho_0]$ is the vector representing the function $\rho_0$, as described in \cref{sec:1d_discrete:notation}. 
+Since the outer elements of the matrix $A$ are $0$, we can rewrite this as
+\begin{equation}
+\label{eq:1d_discrete:rho_summation}
+[\rho_n]_{i_n} = \sum_{i_0=1}^{M-1} \cdots \sum_{i_{n-1}=1}^{M-1} [A]_{i_{n-1},i_{n}} [A]_{i_{n-2}.i_{n-1}} \dots [A]_{i_1,i_2}[A]_{i_0,i_1} [\rho_0]_{i_0}.
+\end{equation}
+
+The sequence of products of elements of $A$ in \cref{eq:1d_discrete:rho_summation} correspond to matrix products. Thus, we can rewrite it as
+\begin{equation}
+\label{eq:1d_discrete:rho_matrix}
+[\rho_n]_{i_n} = \sum_{i_0=1}^{M-1} [A^n]_{i_0,i_n}[\rho_0]_{i_0}.
+\end{equation}
+
+
+\begin{theorem}
+	The expectation of the total cost of a random walk in the discrete approximation is given by
+	\begin{equation}
+	\label{eq:1d_discrete:EQ_sum}
+	\E{Q} = \sum_{n=0}^\infty A^n [h],
+	\end{equation}
+	where $\E{Q}$ is a vector of length $(M-1)$, with each element representing a different starting point for the forager.
+\end{theorem}
+\begin{proof}
+Recall from \cref{thm:1dRW_cost:EV}, for the non-Markov-modulated random walk, the expectation of the total cost was given by
+\begin{equation*}
+\E{Q(x_0)} = \sum_{n=0}^\infty \int_{r_v}^{\lambda-r_v} \rho_n(x_n) h(x_n)dx_n,
+\end{equation*}
+where $h(x_n) = \mathbb{E}_{X_{1}|X_0} \left[ q(X_1,X_{0}) \mid X_0 = x_n \right]$.
+In the discrete approximation, this becomes
+\begin{equation*}
+\E{Q}_{i_0} = \sum_{n=0}^\infty \sum_{i_n=m_r+1}^{M-m_r-1} [\rho_n]_{i_n} [h]_{i_n} \Delta x,
+\end{equation*}
+where $\E{Q(x_0)}_{i_0}$ represents the expected total cost of a random walk beginning at point $i_0$, and $[h]$ is the discretised vector of the function $h$, and thus is a vector with each element being given by the function $h$ represented at a discrete point in the search space. Although there is no $i_0$ on the right-hand side of the equation, the dependence on $i_0$, along with $i_1, i_2, \dots$ is implicit in the vector $[\rho_n]$, as we shall next see.
+
+Substituting in our expression for $[\rho_n]_{i_n}$ from \cref{eq:1d_discrete:rho_matrix}, as well as using the fact that the first $m_r$ and last $m_r$ elements of $[h]$ are $0$, we get
+\begin{equation}
+\label{eq:1d_discrete:an_rho_h}
+\E{Q}_{i_0} = \sum_{n=0}^\infty \sum_{i_n=1}^{M-1} \sum_{i_0=1}^{M-1} [A^n]_{i_0,i_n}[\rho_0]_{i_0} [h]_{i_n} \Delta x.
+\end{equation}
+Since the initial distribution is known to be $\rho_0(x) = \delta(x-a)$, and combining this with the $\Delta x$ term,  we get a Kronecker delta,
+\begin{equation*}
+\E{Q}_{i_a} = \sum_{n=0}^\infty \sum_{i_n=1}^{M-1} \sum_{i_0=1}^{M-1} [A^n]_{i_0,i_n} \delta_{i_0,i_a} [h]_{i_n}.
+\end{equation*}
+Summing over the $i_0$ terms and using the corresponding property of the Kronecker delta we get
+\begin{equation*}
+\E{Q}_{i_a} = \sum_{n=0}^\infty \sum_{i_n=1}^{M-1} [A^n]_{i_a,i_n} [h]_{i_n},
+\end{equation*}
+which can be written as a matrix expression
+\begin{equation*}
+\E{Q} = \sum_{n=0}^\infty A^n [h].
+\end{equation*}
+\end{proof}
+
+As mentioned above, the vector $[h]$ is found by evaluating $h(x)$ at every point in the discretised search space. For the average distance travelled  we use \cref{eq:1dRW_dist:l_integralsv2} or for the number of steps taken, we use $[h] = \vec{1}$.
+
+Unfortunately, when evaluating \cref{eq:1d_discrete:EQ_sum} we still have an infinite sum to deal with, and so evaluating this to a reasonable degree of accuracy may be slow since we have to calculate each term in the summation until the result has converged sufficiently. As with our analytic expression, we can express this without the infinite summation by considering it as a Neumann series and using properties based on this. This time, instead of $\L$, we have matrix $A$ as our operator. For the continuous case we split the proof over  \cref{thm:1dRW_cost:Q_operator_norm_lmax,thm:1dRW_cost:Q_operator_norm_Lk,thm:1dRW_cost:Q_operator_norm_recursive,thm:1dRW_cost:Q_operator_norm}, whereas we do this for the discrete approximation in a single combined \lcnamecref{thm:1d_discrete:operator_norm}.
+
+\begin{lemma}
+\label{thm:1d_discrete:operator_norm}
+$\normop{A} < 1$, where $\normop{\cdot}$ is the operator norm given by
+\begin{equation*}
+\normop{A} = \sup \left\{ \frac{\norm{A v}}{\norm{v}}:  \norm{v} \neq 0 \right\}, 
+\end{equation*}
+with $\norm{\cdot}$ being the maximum column sum.
+\end{lemma}
+\begin{proof}
+For some matrix $v$, with dimensions $(M-1) \times p$, where $p \in \mathbb{N}$, we use the norm given by
+\begin{equation*}
+\norm{v} = \max_{j=1,\dots p}  \sum_{i=1}^{M-1} \abs{v_{i,j}}=:C.
+\end{equation*}
+
+Element $(i,j)$ of the matrix $A v$ is given by
+\begin{equation*}
+[Av]_{i,j} = \sum_{k=1}^{M-1} A_{i,k} v_{k,j},
+\end{equation*}
+and so $A v$ has norm
+\begin{align*}
+\norm{Av} &= \max_{j=1,\dots,p} \sum_{i=1}^{M-1} \left| \sum_{k=1}^{M-1} \abs{A_{i,k} v_{k,j}} \right| \\
+&\leq \max_{j=1,\dots,p} \sum_{i=1}^{M-1} \sum_{k=1}^{M-1} \abs{A_{i,k} v_{k,j}}\\
+&= \max_{j=1,\dots,p}  \sum_{k=1}^{M-1} \abs{v_{k,j}} \sum_{i=1}^{M-1} \abs{A_{i,k}}.
+\end{align*}
+where the second line has equality if and only if $v_{k,j} \geq 0$ for all $k$ and $j$ from $1$ to $M-1$.
+%where the second line follows from the fact that $A_{i,j}=0$ for any $i,j \notin \{m_r+1,m_r+2,\dots,M-m_r-1\}$.
+
+Now, consider the summation over $\left| A_{i,k} \right|$ individually. Recalling the definition of $A_{i,j}$ from \cref{eq:1d_discrete:A_matrix_integral}, and separating the summation into steps to either the left or the right, we can write
+\begin{align*}
+\sum_{i=1}^{M-1} \left|A_{i,k} \right| &= \sum_{i=1}^{k-1} A_{i,k} + \sum_{i=k+1}^{M-1} A_{i,k}\\
+&=\sum_{i=1}^{k-1} \int_{\left|i-k\right|\Delta x}^{\left(\left|i-k\right|+1\right)\Delta x} p(\ell) d\ell + \sum_{i=k+1}^{M-1} \int_{\left|i-k\right|\Delta x}^{\left(\left|i-k\right|+1\right)\Delta x} p(\ell) d\ell ,
+\end{align*}
+where the $i=k$ term in the summation is dropped since it is always $0$.
+These integrals can be combined to give
+\begin{align*}
+\sum_{i=1}^{M-1} \left|A_{i,k} \right| &= \int_{\Delta x}^{(k)\Delta x} \left|p(\ell) \right| d\ell + \int_{\Delta x}^{(M-k)\Delta x} \left| p(\ell) \right| d\ell.
+\end{align*}
+Letting $x = k \Delta x$ and combining into a single integral, we get
+\begin{equation*}
+\sum_{i=1}^{M-1} \left|A_{i,k} \right| \leq \int_{0}^\lambda p(x-x')dx'=: C^*,
+\end{equation*}
+with the inequality coming from the fact that there are some points between $(M-1)\Delta x$ and $M \Delta x$ that are being integrated over. The right hand side is the same as in the proof of \cref{thm:1dRW_cost:Q_operator_norm_lmax}, with $r_v = 0$. Following the same reasoning, the right hand size is less than or equal to $1$ if $\lmax < x < \lambda-\lmax$ and strictly less than $1$ otherwise. This tells us
+\begin{equation*}
+\frac{\norm{A v}}{\norm{v}} \leq \frac{C^*}{C} < 1 \implies \normop{A}<1,
+\end{equation*}
+when $\lmax > \lambda/2$.
+Further, if we instead consider $A^n v$ for some $n\geq 1$, then
+\begin{align*}
+\norm{A^n v} &= \max_{j=1,\dots,p} \sum_{i=1}^{M-1} \sum_{k_1=1}^{M-1} \sum_{k_2=1}^{M-1}  \dots \sum_{k_n=1}^{M-1} \left| A_{i,k_n}A_{k_{n},k_{n-1}}\cdots A_{k_2,k_1} v_{k_1,j} \right|\\
+&= \max_{j=1,\dots,p}  \sum_{k_1=1}^{M-1} \left| v_{k_1,j}\right|  \sum_{k_2=1}^{M-1} \left| A_{k_2,k_{1}}\right|  \dots \sum_{k_n=1}^{M-1}  \left| A_{k_n,k_{n-1}}\right| \sum_{i=1}^{M-1} \left| A_{i,k_n}\right|\\
+&\leq \max_{j=1,\dots,p}  \sum_{k_1=1}^{M-1} \left| v_{k_1,j}\right|  \sum_{k_2=1}^{M-1} \left| A_{k_2,k_{1}}\right|  \dots \sum_{k_n=1}^{M-1}  \left| A_{k_n,k_{n-1}}\right| \int_{0}^{\lambda} p(x_i-x_{k_n})dx_{k_n}\\
+&\leq \sum_{k_1=1}^{M-1} \int_{r_v}^{\lambda} \cdots \int_{0}^{\lambda} \prod_{i=0}^{n-1} p(x_{i+1}-x_i)dx_i =:D\\
+&\leq \max_{j=1,\dots p} \sum_{k_1=1}^{M-1} \abs{v_{{k_1},j}} = \norm{v}.
+\end{align*}
+Then, referring back to the $n=1$ case above, as well as \cref{thm:1dRW_cost:Q_operator_norm_Lk}, we see that the only situation in which we may not have a strict inequality in the final line will be when $\lmax \geq \frac{\lambda }{2^k}$, and so we can conclude that 
+\begin{equation*}
+\frac{\norm{A^nv}}{\norm{v}} \leq \frac{D}{C} < 1 \implies \normop{A^n}<1
+\end{equation*}
+for $\lmax < \frac{\lambda}{2^k}$. We can choose an $n$ such that $\normop{A^n}<1$ for every possible $\lmax$. Then, we choose $n^* = 2^n$ and as we did in \cref{thm:1dRW_cost:Q_operator_norm_recursive}, we can show that $\normop{A^n}<1$ implies $\normop{A}<1$, where we have used the fact that $A$ is a is a self-adjoint operator since it is symmetric. Thus, we conclude that $\normop{A}<1$ for every possible step-length distribution.
+\end{proof}
+
+\begin{theorem}
+	In the discrete approximation, the expected total cost of a random walk is given by
+\begin{equation*}
+\E{Q} = (\identity - A)^{-1} [h],
+\end{equation*}	
+where the $i$th element of the vector $\E{Q}$ represents the expected total cost of a walk that starts at point $i$.
+\end{theorem}
+\begin{proof}
+	Considering $\sum_{n=0}^\infty A^n$ as a Neumann series and using \cref{thm:1d_discrete:operator_norm}, we can write $\sum_{n=0}^\infty A^n$ as $(\Id - A)^{-1}$, where $\Id$ is the identity operator, which in this case is the $(M-1)\times(M-1)$ identity matrix, $\identity$. Substituting this into \cref{eq:1d_discrete:EQ_sum}, we get
+	\begin{equation*}
+\E{Q} = (\identity - A)^{-1} [h].
+	\end{equation*} 
+\end{proof}
+
+Note that this expression is equivalent to solving the system $(\identity - A)x = h$. We can solve this in Matlab using \begin{verbatim}
+Q = (I-A) \ h;
+\end{verbatim}
+
+Recall from \cref{sec:1dRW_cost}, there was also an alternate expression for the expected total cost, \cref{eq:1dRW_cost:EV2_neumann},
+\begin{equation*}
+\E{Q(x_0)} = \int_{r_v}^{\lambda-r_v} [(\Id - \L)^{-1} \rho_0](x_n) h(x_n) dx_n.
+\end{equation*}
+We can derive a discrete space equivalent of this expression in a similar way.
+
+\begin{theorem}
+	In the discrete approximation, the expected total cost of a random walk is given by
+	\begin{equation*}
+	\E{Q} = \left[ (\identity - A)^{-1} [\rho_0] \right][h],
+	\end{equation*}
+	with $\E{Q}$ having dimensions $(M-1)\times(M-1)$ and $[\rho_0]$ and $[h]$ taken to be column and row vectors, respectively.
+\end{theorem}
+\begin{proof}
+Beginning with \cref{eq:1d_discrete:an_rho_h},
+\begin{equation*}
+\E{Q} = \sum_{n=0}^\infty \sum_{i_n=1}^{M-1} \sum_{i_0=1}^{M-1} [A^n]_{i_0,i_n}[\rho_0]_{i_0} [h]_{i_n} \Delta x,
+\end{equation*}
+and using the fact that the matrix $A$ is symmetric, we get
+\begin{equation*}
+\E{Q} = \sum_{n=0}^\infty \sum_{i_n=1}^{M-1}  \left[ A^n [\rho_0] \right]_{i_n} [h]_{i_n} \Delta x.
+\end{equation*}
+Using \cref{thm:1d_discrete:operator_norm}, we can rewrite the infinite summation $\sum_{n=0}^\infty A^n$ to get
+\begin{equation*}
+\E{Q} = \sum_{i_n=1}^{M-1}  \left[ (\identity - A)^{-1} [\rho_0] \right]_{i_n} [h]_{i_n} \Delta x.
+\end{equation*}
+Finally, writing this as a matrix multiplication, we get
+\begin{equation*}
+\E{Q} = \left[ (\identity - A)^{-1} [\rho_0] \right][h].
+\end{equation*}
+\end{proof}	
+
+As before, we can solve this in Matlab using
+\begin{verbatim}
+Q = ( (I-A) \ rho0 ) * h;
+\end{verbatim}
+where $Q$ is a $(M-1)\times (M-1)$ matrix since $\rho_0$ is a column vector and $h$ is a row vector.

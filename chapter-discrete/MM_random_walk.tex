@@ -1,0 +1,227 @@
+%!TEX root = ../thesis.tex
+
+\section{Discretised expressions for a Markov-modulated random walk strategy }
+\label{sec:1d_discrete:MMRW}
+The discretisation of the Markov-modulated case follows similarly. Recalling \cref{eq:1dMMRW_cost:rho_single_recursion},
+\begin{equation*}
+\rho_{n,j}(x_n) = \sum_{i=1}^J \int_{r_{i}}^{\lambda-r_{i}} p_i(x_n-x_{n-1}) \rho_{n-1,i}(x_{n-1}) P_{i,j} dx_{n-1},
+\end{equation*}
+and applying recursively, we get
+\begin{equation}
+\label{eq:1d_discrete:MMRW:rho_recursive}
+\rho_{n,j_n}(x_n) = \sum_{j_{n-1}=1}^J \cdots \sum_{j_{0}=1}^J \int_{r_{j_{n-1}}}^{\lambda-r_{j_{n-1}}} \cdots \int_{r_{j_0}}^{\lambda-r_{j_0}}  \rho_{0,j_0}(x_0) \left[ \prod_{k=0}^{n-1} p_{j_{k}}(x_{k+1} - x_k) P_{j_k,j_{k+1}} dx_i\right] .
+\end{equation}
+As discussed in the unmodulated case, integrals become summations in the discrete approximation. Therefore, \cref{eq:1d_discrete:MMRW:rho_recursive} becomes
+\begin{equation*}
+[\rho_{n,j_n}]_{i_n} = \sum_{j_{n-1}=1}^J \cdots \sum_{j_{0}=1}^J \sum_{i_{n-1}=m_{j_{n-1}}+1}^{M-m_{j_{n-1}}-1} \cdots \sum_{i_0=m_{j_0}+1}^{M-m_{j_0}-1}  [\rho_{0,j_0}]_{i_0} \left[ \prod_{k=0}^{n-1} [A_{j_{k}}]_{i_k,i_{k+1}} [P]_{j_k,j_{k+1}} dx_i\right] .
+\end{equation*}
+We can rewrite this as
+\begin{equation}
+\label{eq:1d_discrete:MM_rho_sums}
+[\rho_{n,j_n}]_{i_n} = \sum_{j_{n-1}=1}^J \cdots \sum_{j_{0}=1}^J \sum_{i_{n-1}=1}^{M-1} \cdots \sum_{i_0=1}^{M-1}  [\rho_{0,j_0}]_{i_0} \left[ \prod_{k=0}^{n-1} [A_{j_{k}}]_{i_k,i_{k+1}} [P]_{j_k,j_{k+1}} dx_i\right] 
+\end{equation}
+since the additional summation terms now included are zero anyway due to the structure of the $A_j$ matrices. We can rewrite the $\rho_{0,j}$ vectors as a single vector by concatenating them to form the vector $[\rho_0]$. That is,
+\begin{equation*}
+[\rho_0] = ([\rho_{0,1}],\dots,[\rho_{0,J}])^\top,
+\end{equation*}
+ Then, the element $[\rho_{0,j}]_i$ is equivalent to $[\rho_0]_{(j-1)(M-1)+i}$, and similarly for $\rho_1$, $\rho_2$, etc. Just as we did with the unmodulated case, we can express \cref{eq:1d_discrete:MM_rho_sums} as a matrix product:
+\begin{equation}
+\label{eq:1d_discrete:MM_rho_matrix}
+[\rho_{n,j_n}]_{i_n} = \sum_{j_0 = 1}^J \sum_{i_0=1}^{M-1} [\rho_{0,j_0}]_{i_0} [(\Amat^n)_{j_0,j_n}]_{i_0,i_n},
+\end{equation}
+
+where the matrix $\Amat$ is given by
+\begin{equation*}
+\Amat =\begin{pmatrix}
+[A_1] P_{1,1} & [A_1]P_{1,2} & \cdots & [A_1] P_{1,J} \\
+[A_2]P_{2,1} & [A_2]P_{2,2} & \cdots & [A_2]P_{2,J} \\
+\vdots  & \vdots  & \ddots & \vdots  \\
+[A_J]P_{J,1} & [A_J]P_{J,2} & \cdots & [A_J]P_{J,J} 
+\end{pmatrix},
+\end{equation*}
+where each $A_j$ matrix has size $(M-1) \times (M-1)$, so the matrix $\Amat$ must have size $J(M-1) \times J(M-1)$. The expression $[(\Amat^n)_{j_0,j_n}]_{i_0,i_n}$ represents the $(i_0,i_n)$th element of the $(j_0,j_n)$th submatrix of $\Amat$.
+
+Recall from \cref{thm:1dMMRW_cost:EV_Qj}, the cost incurred in a given state $j$ is
+\begin{equation*}
+\E{Q_j(a)} = \sum_{n=0}^\infty \int_{r_v}^{\lambda-r_v} \rho_{n,j}(x_n) h_j(x_n) dx_n,
+\end{equation*}
+which in the discretised search space becomes
+\begin{equation*}
+\E{Q_j}_{i_a} = \sum_{n=0}^\infty \sum_{i_n = 1}^{M-1} [\rho_{n,j}]_{i_n} [h_j]_{i_n} \Delta x.
+\end{equation*}
+
+Substituting the expression for $[\rho_{0,j}]_{i_n}$ from \cref{eq:1d_discrete:MM_rho_matrix}, we get
+\begin{equation}
+\label{eq:1d_discrete:Qj_predelta}
+\E{Q_j}_{i_a} = \sum_{n=0}^\infty \sum_{i_n = 1}^{M-1} \sum_{j_0 = 1}^J \sum_{i_0=1}^{M-1}[\rho_{0,j_0}]_{i_0} [(\Amat^n)_{j_0,j}]_{i_0,i_n} [h_j]_{i_n} \Delta x.
+\end{equation}
+
+We combine the the initial distribution, $\vec{\rho_0}(x) = \delta(x-a)\vec{z_0}$ with the $\Delta x$ term to obtain a Kronecker delta,
+\begin{equation*}
+\E{Q_j}_{i_a} = \sum_{n=0}^\infty \sum_{i_n = 1}^{M-1} \sum_{j_0 = 1}^J \sum_{i_0=1}^{M-1}\delta_{j_0,i_0,i_a} z_{0,j_0} [(\Amat^n)_{j_0,j}]_{i_0,i_n} [h_j]_{i_n} \Delta x,
+\end{equation*}
+where $\delta_{j_0,i_0,i_a}$ is Kronecker delta for $(i_0,i_a)$ in the $j_0$th subvector.
+Now, summing over $i_0$ and using the property of the Kronecker delta,
+\begin{equation}
+\label{eq:1d_discrete:Qj_final}
+\E{Q_j}_{i_a} = \sum_{n=0}^\infty \sum_{i_n = 1}^{M-1} \sum_{j_0 = 1}^J \sum_{i_0=1}^{M-1} [(\Amat^n)_{j_0,j}]_{i_a,i_n} [h_j]_{i_n} \Delta x,
+\end{equation}
+The $\Amat$ term and the $[h]$ term do not constitute a full matrix multiplication, since we are only considering a single value of $j$. This relates back to the issue around \cref{thm:1dMMRW_cost:EV_Qj_sum} and our inability to find a simple expression for the expected cost over a single state. The probability of a forager's location on step $n$ in some state $j$ depends on the location on step $n-1$ in \emph{any} state.
+
+To demonstrate this issue further, we split the $\Amat^n$ term into submatrices, allowing us to write \cref{eq:1d_discrete:Qj_final} as a matrix multiplication. The matrix is split, by
+\begin{equation*}
+(\Amat^n) =  \begin{pmatrix}
+[(\Amat^n)_{1,1}] & [(\Amat^n)_{1,2}] & \cdots & [(\Amat^n)_{1,J}] \\
+[(\Amat^n)_{2,1}] & [(\Amat^n)_{2,2}] & \cdots & [(\Amat^n)_{2,J}] \\
+\vdots  & \vdots  & \ddots & \vdots  \\
+[(\Amat^n)_{J,1}] & [(\Amat^n)_{J,2}] & \cdots & [(\Amat^n)_{J,J}] 
+\end{pmatrix},
+\end{equation*}
+where each $[(\Amat^n)_{i,j}]$ is an $(M-1) \times (M-1)$ submatrix, corresponding to the elements $((i-1)(M-1)+1,(j-1)(M-1)+1)$ up to $(i(M-1),j(M-1))$ of $\Amat^n$. 
+That is, $[(\Amat^n)_{i,j}]$ is not the same as $[(\Amat)_{i,j}]^n$, since for some $i,j \in \statespace$, $[(\Amat^2)_{i,j}]$ will actually depend on $[(\Amat)_{i,j}]$ for every $i,j \in \statespace$.
+Thus, \cref{eq:1d_discrete:Qj_final} becomes
+\begin{equation}
+\label{eq:1d_discrete:Qj_final_split}
+\E{Q_j}_{i_a} = \sum_{n=0}^\infty  \sum_{j_0 = 1}^J z_{0,j_0}  [(\Amat^n)_{j_0,j}][h_j].
+\end{equation}
+
+This expression, although looking simpler than \cref{eq:1d_discrete:Qj_final}, highlights an important problem. To actually determine the values of $[(\Amat^n)_{i,j}]$, for some $n$, we require knowing the values of the entire $(\Amat^{n-1})$ matrix. This also means we must know the values of $[(\Amat^{n-1})_{i,j}]$ for every $i$ and $j$. Thus, we still have to evaluate $(\Amat^{n})$ in its entirety for every single term in the summation over $n$. This makes sense, since a walk that finishes in state $j$ could have previously been in any other state and so all possible states must be taken into account. A consequence of this is that we cannot consider the infinite sum over the submatrix $(\Amat)^n_{j_0,j}$, but rather have to consider the full matrix $\Amat^n$, extracting the corresponding submatrix at the end.
+
+We can still, however, remove the infinite summation using a Neumann series but we must keep the entire matrix $\Amat$ in our expression. 
+\begin{lemma}
+	\label{thm:1d_discrete:MMRW_A_opnorm}
+	The matrix $\Amat$ has an operator norm less than unity.
+\end{lemma}
+\begin{proof}
+We first show that $\Amat^\top$ has an operator norm less than unity. Any matrix $v$, with dimensions $J(M-1) \times p$, where $p \in \mathbb{N}$, has a norm given by
+\begin{equation*}
+\norm{v} = \max_{j=1,\dots p}  \sum_{i=1}^{J(M-1)} \abs{v_{i,j}}.
+\end{equation*}
+If we consider the matrix $v$ as $J$ individual matrices concatenated vertically, each with dimensions $(M-1) \times p$, denoted by
+\begin{equation*}
+v = ([v_1],[v_2],\dots,[v_J])^\top,
+\end{equation*}
+we can write this norm as
+\begin{equation*}
+\norm{v} = \max_{j=1,\dots p}  \sum_{m=1}^J \sum_{i=1}^{M-1} \abs{[v_m]_{i,j}}=:C.
+\end{equation*}
+Element $(i,j)$ of the matrix $\Amat v$ is given by
+\begin{equation*}
+[\Amat^\top v]_{i,j} = \sum_{k=1}^{J(M-1)} \Amat^\top_{i,k} v_{k,j},
+\end{equation*}
+or alternatively
+\begin{equation*}
+[(\Amat^\top v)_m]_{i,j} = \sum_{n=1}^{J} \sum_{k=1}^{M-1} [(\Amat^\top_{m,n})]_{i,k} [v_n]_{k,j},
+\end{equation*}
+where $(\Amat^\top v)_m$ is the $m$th concatenated matrix making up $\Amat^\top v$.
+Then, $\Amat^\top v$ has norm
+\begin{align*}
+\norm{\Amat^\top v} &= \max_{j=1,\dots p}  \sum_{m=1}^J \sum_{i=1}^{M-1} \left| \sum_{n=1}^{J} \sum_{k=1}^{M-1} [(\Amat^\top_{m,n})]_{i,k} [v_n]_{k,j} \right|\\
+&\leq \max_{j=1,\dots p}  \sum_{m=1}^J \sum_{i=1}^{M-1}  \sum_{n=1}^{J} \sum_{k=1}^{M-1}  [(\Amat^\top_{m,n})]_{i,k} \abs{[v_n]_{k,j}} \\
+&=\max_{j=1,\dots p}  \sum_{m=1}^J \sum_{i=1}^{M-1}  \sum_{n=1}^{J} \sum_{k=1}^{M-1} P_{n,m} [A_n]_{i,k} \abs{[v_n]_{k,j}} \\
+&=\max_{j=1,\dots p}  \sum_{m=1}^J \sum_{n=1}^{J} P_{n,m} \sum_{i=1}^{M-1}   \sum_{k=1}^{M-1}  [A_n]_{i,k} \abs{[v_n]_{k,j}}=:C^*.
+\end{align*}
+Now, using the results from the unmodulated case, we know that for any $n$, 
+\begin{equation*}
+\sum_{i=1}^{M-1}   \sum_{k=1}^{M-1}  [A_n]_{i,k} [v_n]_{k,j} < \sum_{k=1}^J \abs{[v_n]_{k,j}}.
+\end{equation*}
+Substituting this in,
+\begin{align*}
+C^* &< \max_{j=1,\dots p}  \sum_{m=1}^J \sum_{n=1}^{J} P_{n,m}  \sum_{k=1}^{M-1}  \abs{[v_n]_{k,j}}\\
+&= \max_{j=1,\dots p} \sum_{n=1}^{J}  \sum_{k=1}^{M-1}  \abs{[v_n]_{k,j}} = \norm{v} = C,
+\end{align*}
+since the row sum of the transition matrix $P$ must be $1$ for every $n$.
+Therefore,
+\begin{equation*}
+\frac{\norm{\Amat^\top v}}{\norm{v}} \leq \frac{C^*}{C} < 1 \implies \normop{\Amat^\top} < 1.
+\end{equation*}
+Since the adjoint of a matrix is the transpose, and using \cref{thm:adjointnorm}, we get $\normop{\Amat} = \normop{\Amat^\top} < 1$.
+\end{proof}
+
+\begin{theorem}
+	In the discrete approximation, the expected total cost across state $j$ of a Markov-modulated random walk is given by
+\begin{equation}
+\label{eq:1d_discrete:Qj_neumann}
+\E{Q_j}_{i_a} = \sum_{i_n = 1}^{M-1}  \sum_{j_0 = 1}^J [(\identity - \Amat)^{-1}_{j0,j}]_{i_a, i_n} z_{0,j_0} [h_j]_{i_n},
+\end{equation}
+where the $i_a$th element of $\E{Q_j}$ represents the cost incurred in state $j$ of a search that begins at discrete point $i_a$.
+\end{theorem}
+\begin{proof}
+		Considering $\sum_{n=0}^\infty \Amat^n$ as a Neumann series and using \cref{thm:1d_discrete:MMRW_A_opnorm}, we can write $\sum_{n=0}^\infty \Amat^n$ as $(\Id - \Amat)^{-1}$, where $\Id$ is the identity operator, which in this case is the $J(M-1) \times J(M-1)$ identity matrix, $\identity$. Substituting this into \cref{eq:1d_discrete:Qj_final}, we get
+	\begin{equation*}
+	\E{Q_j}_{i_a} =\sum_{i_n = 1}^{M-1}  \sum_{j_0 = 1}^J [(\identity - \Amat)^{-1}_{j0,j}]_{i_a, i_n} z_{0,j_0} [h_j]_{i_n}.
+	\end{equation*}
+\end{proof}
+
+Although we are able to express the expected total cost incurred in a single state without an infinite summation, this expression isn't as neat as our matrix multiplication in \cref{eq:1d_discrete:Qj_final_split}. 
+
+Recall we were able to find a simple expression for the expectation of the total cost for \emph{all} states of a Markov-modulated random walk. This same reasoning is valid in the discrete approximation. 
+
+
+\begin{theorem}
+	In the discrete approximation, the expected total cost of a Markov-modulated random walk is given by
+	\begin{equation*}
+	\E{Q}_{i_a} = \sum_{j_{0}=1}^J [(\identity - \Amat)^{-1} z_{0,j_0}h]_{(j_0-1)(M-1) +i_a},
+	\end{equation*}	
+	where the $i$th element of $\E{Q}$ represents the expected total cost of a walk that starts at point $i$, and the vector $ [(\identity - \Amat)^{-1} h]$ has length $J(M-1)$.
+\end{theorem}
+\begin{proof}
+	Summing over \cref{eq:1d_discrete:Qj_neumann}, we get
+	\begin{align*}
+	\E{Q}_{i_a} &= \sum_{j=1}^J \E{Q_j}_{i_a}\\
+	&= \sum_{j=1}^J \sum_{i_n = 1}^{M-1}  \sum_{j_0 = 1}^J [(\identity - \Amat)^{-1}_{j0,j}]_{i_a, i_n} z_{0,j_0} [h_j]_{i_n},
+	\end{align*}
+	which is equivalent to
+	\begin{equation*}
+	\E{Q}_{i_a} = \sum_{j_0 = 1}^J  [(\identity - \Amat)^{-1}  z_{0,j_0} h]_{ (j_0-1)(M-1)+i_a}.
+	\end{equation*}
+\end{proof}
+
+Recall, we had another analytic expression for the expected cost incurred in a single state,
+\begin{equation*}
+\E{Q_j(x_0)} = 	\int_{x_n=r_v}^{\lambda-r_v} \left[(\Id - \Lmat)^{-1} \vec{\rho_0}\right]_j (x_n) h_j(x_n)dx_n,
+\end{equation*}	
+which doesn't require the starting location of the search to be known exactly. Following a similar procedure to that of above, we can find a discretised version of this expression.
+\begin{theorem}
+	\label{thm:1d_discrete:Qj_alternate}
+	In the discrete approximation, the expected total cost incurred in state $j$ of a Markov-modulated random walk can also be expressed as
+	\begin{equation}
+	\label{eq:1d_discete:Qj_alternate}
+	\E{Q_j} =  \sum_{i_n = 1}^{M-1}  \left[\left( \rho_0 \left( \identity - {\Amat}\right)^{-1} \right)_{j} \right]_{i_n} [h_j]_{i_n} \Delta x.
+	\end{equation}
+	where the $i_a$th element of $\E{Q_j}$ represents the cost incurred in state $j$ of a search that begins at discrete point $i_a$.
+\end{theorem}
+\begin{proof}
+	Beginning with \cref{eq:1d_discrete:Qj_predelta},
+	\begin{equation*}
+	\E{Q_j} = \sum_{n=0}^\infty \sum_{i_n = 1}^{M- 1}  \sum_{j_0 = 1}^J \sum_{i_0=1}^{M-1} [\rho_{0,j_0}]_{i_0} [(\Amat^n)_{j_0,j}]_{ i_0, i_n} [h_j]_{i_n} \Delta x,
+	\end{equation*}
+	we can rewrite this as a matrix multiplication, to get
+	\begin{equation*}
+	\E{Q_j} = \sum_{n=0}^\infty \sum_{i_n = 1}^{M-1}  \left[\rho_0 \left({\Amat^n} \right)_{j} \right]_{i_n} [h_j]_{i_n} \Delta x,
+	\end{equation*}
+	where $\left[\rho_0 \left({\Amat^n} \right)_{j} \right]$ is a vector of length $J(M-1)$. The order of the two summations can be changed, and we can once again use the fact that $A$ has an operator norm to rearrange this. We rewrite $\sum_{n=0}^\infty {(\Amat^n})$ as $((\Id - \Amat)^{-1})$, and our expression becomes
+	\begin{equation*}
+	\E{Q_j} =  \sum_{i_n = 1}^{M-1}  \left[\left( \rho_0 \left( \identity - {\Amat}\right)^{-1} \right)_{j} \right]_{i_n} [h_j]_{i_n} \Delta x.
+	\end{equation*}
+\end{proof}
+
+
+\begin{theorem}
+	In the discrete approximation, the expected total cost of a Markov-modulated random walk is also given by
+	\begin{equation*}
+	\E{Q} = [\rho_0 (\identity-\Amat)^{-1}  h] \Delta x.
+	\end{equation*}	
+\end{theorem}
+
+\begin{proof}
+	Beginning with \cref{eq:1d_discete:Qj_alternate}, from \cref{thm:1d_discrete:Qj_alternate}, we sum over all possible states
+	\begin{equation*}
+	\E{Q} = \sum_{j=1}^J  \sum_{i_n = 1}^{M-1}  \left[\rho_0 \left( \left( \identity - {\Amat}\right)^{-1} \right)_{j} \right]_{i_n} [h_j]_{i_n} \Delta x.
+	\end{equation*}
+	
+	We can further simplify this expression by writing it as a matrix product, resulting in
+	\begin{equation*}
+	\E{Q} = [\rho_0(\identity-\Amat)^{-1}  h] \Delta x.
+	\end{equation*}
+\end{proof}
